@@ -569,9 +569,9 @@ function copyOTP() {
 }
 
 // ── API (smails.dev — same as the Telegram bot) ──
-// Put your Vercel proxy URL here, e.g. 'https://YOUR-SITE.vercel.app/api/smails'
-const PROXY = '';
-const U = path => PROXY ? PROXY + '?p=' + encodeURIComponent(path) : 'https://smails.dev/api/mailbox' + path;
+// Put your Vercel proxy URL here, e.g. 'https://ztemppro.vercel.app/api/smails'
+const PROXY = 'https://ztemppro.vercel.app/api/smails';
+const U = path => PROXY + '?path=' + encodeURIComponent(path);
 const AUTH = t => ({ 'Authorization': 'Bearer ' + t });
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function tfetch(url, opt = {}, ms = 12000) {
