@@ -104,7 +104,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .btn-copy-otp:active{transform:scale(0.94)}
 #email-subject{font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
 #email-sender{font-size:0.65rem;font-weight:500;color:var(--txt-muted);margin-bottom:14px}
-#email-body{font-size:0.85rem;color:var(--txt);background:rgba(0,0,0,0.3);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--glass-border);overflow-x:auto;width:100%;box-sizing:border-box;-webkit-overflow-scrolling:touch;line-height:1.6;min-height:80px}
+#email-body{font-size:0.85rem;color:var(--txt);background:rgba(0,0,0,0.3);padding:8px;border-radius:var(--radius-sm);border:1px solid var(--glass-border);overflow:visible;width:100%;box-sizing:border-box;line-height:1.6;min-height:200px}
+.email-render{display:block;width:100%;min-height:160px}
 #email-body iframe{width:100%;min-height:280px;border:none;border-radius:10px;background:#fff}
 #email-body pre{white-space:pre-wrap;font-family:'Inter',sans-serif;margin:0}
 .section-label{font-size:0.55rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--txt-dim);margin-bottom:12px}
@@ -558,6 +559,7 @@ function copyOTP() {
     const iframe = bodyEl.querySelector('iframe');
     if (iframe) { try { text = iframe.contentWindow.document.body.innerText; } catch (e) { text = ''; } }
     else text = bodyEl.innerText;
+    if (window._msgText && window._msgText.trim()) text = window._msgText;
     if (!text || !text.trim()) { toastMsg('No content to copy!', true); return; }
     let code = null;
     const fbMatch = text.match(/FB-\d{5,8}/i);
@@ -687,6 +689,30 @@ async function checkMessages() {
     } catch (e) { console.error(e); }
 }
 
+function renderEmailHtml(bodyEl, html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('script,iframe,object,embed,link,meta,base,form,noscript').forEach(n => n.remove());
+    doc.querySelectorAll('*').forEach(el => {
+        [...el.attributes].forEach(a => {
+            const n = a.name.toLowerCase(), v = a.value.trim().toLowerCase();
+            if (n.startsWith('on')) el.removeAttribute(a.name);
+            else if ((n === 'href' || n === 'src' || n === 'xlink:href') && v.startsWith('javascript:')) el.removeAttribute(a.name);
+        });
+        if (el.tagName === 'A') { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
+    });
+    const text = (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+    const host = document.createElement('div');
+    host.className = 'email-render';
+    bodyEl.appendChild(host);
+    const root = host.attachShadow({ mode: 'open' });
+    root.innerHTML = '<style>:host{display:block}.m{background:#fff;color:#222;padding:15px;border-radius:10px;font-family:-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.5;overflow-x:auto;word-break:break-word}.m img{max-width:100%;height:auto}.m table{max-width:100%}.m a{color:#2563eb}</style><div class="m"></div>';
+    const m = root.querySelector('.m');
+    doc.head.querySelectorAll('style').forEach(st => m.appendChild(st.cloneNode(true)));
+    while (doc.body.firstChild) m.appendChild(doc.body.firstChild);
+    if (!text && !m.querySelector('img,table')) m.textContent = 'Empty message.';
+    return text;
+}
+
 async function viewMessage(id) {
     if (!currentSidToken) return;
     const loader = document.getElementById('loader');
@@ -705,15 +731,10 @@ async function viewMessage(id) {
         const bodyEl = document.getElementById('email-body');
         bodyEl.innerHTML = '';
         const html = Array.isArray(msg.html) ? msg.html.join('') : (msg.html || '');
+        window._msgText = (msg.subject || '') + '\n' + (msg.text || '');
         if (html) {
-            const iframe = document.createElement('iframe');
-            iframe.style.cssText = 'width:100%;min-height:280px;border:none;border-radius:10px;background:#fff;';
-            iframe.setAttribute('sandbox', 'allow-same-origin allow-popups allow-popups-to-escape-sandbox');
-            bodyEl.appendChild(iframe);
-            iframe.srcdoc = '<meta name="viewport" content="width=device-width,initial-scale=1.0"><base target="_blank"><style>body{margin:0;padding:15px;font-family:-apple-system,sans-serif;background:#fff;color:#222;}img{max-width:100%;height:auto;}</style>' + html;
-            const adjust = () => { try { const h = iframe.contentWindow.document.documentElement.scrollHeight; if (h > 50) iframe.style.height = h + 'px'; } catch (e) {} };
-            iframe.onload = () => { adjust(); setTimeout(adjust, 1000); setTimeout(adjust, 3000); };
-        } else if (msg.text) bodyEl.innerHTML = `<pre>${esc(msg.text)}</pre>`;
+            window._msgText = (msg.subject || '') + '\n' + renderEmailHtml(bodyEl, html);
+        } else if (msg.text) bodyEl.innerHTML = `<div style="background:#fff;color:#222;padding:15px;border-radius:10px;white-space:pre-wrap;word-break:break-word;font-size:0.85rem;line-height:1.5">${esc(msg.text)}</div>`;
         else bodyEl.textContent = 'Empty message.';
     } catch (e) { toastMsg('Failed to load message', true); }
     loader.style.display = 'none';
