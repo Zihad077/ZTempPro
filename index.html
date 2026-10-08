@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#0a0a14" />
+<meta name="referrer" content="no-referrer" />
+<title>ZTempPro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--glass:rgba(255,255,255,0.06);--glass-light:rgba(255,255,255,0.12);--glass-border:rgba(255,255,255,0.08);--glass-border-strong:rgba(255,255,255,0.16);--glass-shadow:0 8px 32px rgba(0,0,0,0.5);--glass-blur:blur(40px) saturate(1.4);--bg-base:#0a0a14;--accent-start:#6c5ce7;--accent-mid:#a855f7;--accent-end:#ec4899;--accent-solid:#7c3aed;--accent-soft:rgba(124,58,237,0.15);--txt:#f1f1f6;--txt-muted:rgba(255,255,255,0.50);--txt-dim:rgba(255,255,255,0.25);--radius-card:28px;--radius-sm:16px;--radius-full:9999px;--ease-spring:cubic-bezier(0.34,1.56,0.64,1);--ease-smooth:cubic-bezier(0.23,1,0.32,1)}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-base);color:var(--txt);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--accent-soft);border-radius:8px}
+::selection{background:var(--accent-solid);color:#fff}
+.bg-gradient{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 50% 40% at 20% 20%,rgba(108,92,231,0.12),transparent 60%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(236,72,153,0.08),transparent 60%),var(--bg-base);animation:bgFloat 16s ease-in-out infinite alternate}
+@keyframes bgFloat{0%{transform:scale(1) rotate(0deg)}100%{transform:scale(1.05) rotate(1.5deg)}}
+#preloader{position:fixed;inset:0;background:var(--bg-base);z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity 0.8s ease,visibility 0.8s}
+#preloader.out{opacity:0;visibility:hidden}
+.pl-badge{font-size:0.55rem;letter-spacing:4px;color:var(--txt-muted);margin-bottom:20px;text-transform:uppercase;font-weight:500;opacity:0.4}
+.pl-logo{font-size:2.8rem;font-weight:900;letter-spacing:4px;color:#fff;text-transform:uppercase;display:flex;align-items:baseline;gap:2px}
+.pl-logo .r{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pl-track{width:180px;height:2px;background:rgba(255,255,255,0.06);margin-top:24px;border-radius:4px;overflow:hidden}
+.pl-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));border-radius:4px;animation:plFill 2s cubic-bezier(0.4,0,0.2,1) forwards;box-shadow:0 0 16px var(--accent-soft)}
+@keyframes plFill{to{width:100%}}
+.pl-pct{font-size:0.6rem;letter-spacing:2px;color:var(--txt-muted);margin-top:12px;font-weight:400}
+.wrap{width:100%;max-width:440px;margin:0 auto;padding:12px 14px 100px;position:relative;z-index:2}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 20px}
+.logo-row{display:flex;align-items:center;gap:12px}
+.logo-icon{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--accent-start),var(--accent-end));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;box-shadow:0 4px 16px var(--accent-soft)}
+.logo-text{font-size:1.2rem;font-weight:800;letter-spacing:2px;color:#fff;display:flex;gap:1px}
+.logo-text .logo-char{display:inline-block;animation:logoFloat 3.5s ease-in-out infinite}
+.logo-text .logo-char:nth-child(1){animation-delay:0s}
+.logo-text .logo-char:nth-child(2){animation-delay:0.08s}
+.logo-text .logo-char:nth-child(3){animation-delay:0.16s}
+.logo-text .logo-char:nth-child(4){animation-delay:0.24s}
+.logo-text .logo-char:nth-child(5){animation-delay:0.32s}
+.logo-text .logo-char:nth-child(6){animation-delay:0.40s}
+.logo-text .logo-char:nth-child(7){animation-delay:0.48s}
+.logo-text .logo-char:nth-child(8){animation-delay:0.56s}
+.logo-text .logo-char.r{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}35%{transform:translateY(-3px)}65%{transform:translateY(1px)}}
+.top-actions{display:flex;gap:8px}
+.top-btn{width:40px;height:40px;border-radius:14px;background:var(--glass);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);color:var(--txt-muted);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all 0.3s var(--ease-spring)}
+.top-btn:active{transform:scale(0.90);background:var(--glass-light)}
+.glass-card{background:var(--glass);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:var(--radius-card);padding:24px 22px;margin-bottom:16px;box-shadow:var(--glass-shadow);transition:border-color 0.3s ease,transform 0.2s ease}
+.glass-card:hover{border-color:var(--glass-border-strong)}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-mid);flex-shrink:0;animation:pulse 2.5s ease-in-out infinite;box-shadow:0 0 12px var(--accent-soft)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--accent-soft);opacity:1}50%{box-shadow:0 0 0 8px transparent;opacity:0.6}}
+.eyebrow-text{font-size:0.55rem;font-weight:600;color:var(--txt-muted);text-transform:uppercase;letter-spacing:2.5px}
+.hero-title{font-size:1.9rem;font-weight:900;color:#fff;line-height:1.1;margin-bottom:6px;letter-spacing:-1px}
+.hero-title .highlight{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:0.9rem;color:var(--txt-muted);margin-bottom:20px;line-height:1.6;font-weight:400}
+.hero-sub .highlight{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:600}
+.input-wrap{position:relative;margin-bottom:12px}
+.url-input{width:100%;padding:16px 160px 16px 48px;border:1px solid var(--glass-border);border-radius:var(--radius-sm);background:rgba(0,0,0,0.35);color:var(--txt);font-size:0.95rem;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.3s,box-shadow 0.3s;backdrop-filter:blur(10px)}
+.url-input::placeholder{color:var(--txt-dim)}
+.url-input:focus{border-color:var(--accent-mid);box-shadow:0 0 0 3px var(--accent-soft)}
+.input-left-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--txt-muted);font-size:18px;pointer-events:none;opacity:0.5}
+.input-actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:4px;align-items:center}
+.input-action-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 10px;font-size:0.55rem;font-weight:600;color:var(--txt-muted);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.25s;display:flex;align-items:center;gap:4px;letter-spacing:0.3px;white-space:nowrap}
+.input-action-btn i{font-size:13px}
+.input-action-btn:active{transform:scale(0.92)}
+.input-action-btn.edit-btn{background:rgba(124,58,237,0.12);border-color:rgba(124,58,237,0.15);color:var(--accent-mid)}
+.btn-group{display:flex;gap:10px;margin-top:4px}
+.btn-glass{flex:1;padding:14px 16px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.35s var(--ease-spring);display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.04);backdrop-filter:blur(10px);color:var(--txt);box-shadow:0 2px 12px rgba(0,0,0,0.1)}
+.btn-glass i{font-size:16px}
+.btn-glass:active{transform:scale(0.95)}
+.btn-glass.primary{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));border-color:transparent;color:#fff;box-shadow:0 4px 20px var(--accent-soft)}
+.btn-glass.primary:active{box-shadow:0 2px 12px var(--accent-soft);transform:scale(0.95)}
+.btn-glass.primary:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-glass.secondary{background:rgba(255,255,255,0.04)}
+.btn-glass.secondary:active{background:rgba(255,255,255,0.10)}
+.status-box{display:none;margin-top:14px;padding:12px 16px;border-radius:var(--radius-sm);align-items:center;gap:12px;font-size:0.8rem;font-weight:500;font-family:'Inter',sans-serif}
+.status-box.loading{display:flex;background:rgba(255,255,255,0.04);color:var(--txt-muted);border:1px solid var(--glass-border)}
+.status-box.error{display:flex;background:rgba(239,68,68,0.06);color:#f87171;border:1px solid rgba(239,68,68,0.12)}
+.spinner{width:14px;height:14px;border:2px solid var(--glass-border);border-top-color:var(--accent-mid);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.inbox-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.inbox-header .eyebrow-text{font-size:0.5rem}
+.inbox-count{font-size:0.6rem;font-weight:500;color:var(--txt-muted);background:rgba(255,255,255,0.06);padding:2px 12px;border-radius:var(--radius-full);border:1px solid var(--glass-border)}
+#email-list{display:flex;flex-direction:column;gap:8px}
+.email-item{background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:all 0.3s var(--ease-smooth);display:flex;align-items:center;gap:14px;overflow:hidden}
+.email-item:active{transform:scale(0.98);background:rgba(255,255,255,0.06)}
+.email-item .avatar{width:40px;height:40px;border-radius:12px;flex-shrink:0;object-fit:cover;background:var(--glass);border:1px solid var(--glass-border)}
+.email-item .body{flex:1;min-width:0}
+.email-item .subject{font-size:0.8rem;font-weight:600;color:#fff;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.email-item .sender{font-size:0.6rem;font-weight:500;color:var(--txt-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.email-item .arrow{color:var(--txt-dim);font-size:14px;flex-shrink:0}
+.email-empty{text-align:center;padding:40px 20px;color:var(--txt-dim);font-size:0.7rem;font-weight:400;display:flex;flex-direction:column;align-items:center;gap:12px}
+.email-empty .wait-loader{width:28px;height:28px;margin:0 auto;position:relative}
+.email-empty .wait-loader::before{content:'';box-sizing:border-box;position:absolute;inset:0;border-radius:50%;border:2px solid var(--glass-border);border-top-color:var(--accent-mid);animation:spin 0.8s linear infinite}
+#email-content{display:none;margin-top:16px;border-top:1px solid var(--glass-border);padding-top:18px}
+.email-content-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.btn-back{padding:6px 16px;border-radius:var(--radius-full);background:var(--glass);border:1px solid var(--glass-border);color:var(--txt-muted);font-size:0.6rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.3s}
+.btn-back:active{transform:scale(0.94)}
+.btn-copy-otp{padding:6px 16px;border-radius:var(--radius-full);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);color:#34d399;font-size:0.6rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.3s}
+.btn-copy-otp:active{transform:scale(0.94)}
+#email-subject{font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
+#email-sender{font-size:0.65rem;font-weight:500;color:var(--txt-muted);margin-bottom:14px}
+#email-body{font-size:0.85rem;color:var(--txt);background:rgba(0,0,0,0.3);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--glass-border);overflow-x:auto;width:100%;box-sizing:border-box;-webkit-overflow-scrolling:touch;line-height:1.6;min-height:80px}
+#email-body iframe{width:100%;min-height:280px;border:none;border-radius:10px;background:#fff}
+#email-body pre{white-space:pre-wrap;font-family:'Inter',sans-serif;margin:0}
+.section-label{font-size:0.55rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--txt-dim);margin-bottom:12px}
+.faq-list{display:flex;flex-direction:column;gap:6px}
+.faq-item{background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:var(--radius-sm);overflow:hidden;transition:0.3s}
+.faq-item.open{border-color:var(--accent-soft)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;gap:10px}
+.faq-q-txt{font-size:0.85rem;font-weight:600;color:var(--txt);line-height:1.3}
+.faq-arr{font-size:14px;color:var(--txt-dim);transition:0.3s;flex-shrink:0}
+.faq-item.open .faq-arr{transform:rotate(180deg);color:var(--accent-mid)}
+.faq-a{display:none;padding:0 16px 14px;font-size:0.82rem;color:var(--txt-muted);line-height:1.6;font-weight:400}
+.faq-item.open .faq-a{display:block}
+.s-div{height:1px;background:linear-gradient(90deg,transparent,var(--glass-border),transparent);margin:4px 0 14px;position:relative}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:var(--radius-sm);margin-bottom:18px}
+.toggle-row .label{font-size:0.85rem;font-weight:500;color:var(--txt)}
+#checkboxInput{display:none}
+.toggleSwitch{display:flex;align-items:center;justify-content:center;position:relative;width:44px;height:24px;background-color:rgba(255,255,255,0.10);border:1px solid var(--glass-border);border-radius:40px;cursor:pointer;transition-duration:.3s;flex-shrink:0}
+.toggleSwitch::after{content:"";position:absolute;height:18px;width:18px;left:2px;background:#fff;border-radius:50%;transition-duration:.3s;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+#checkboxInput:checked+.toggleSwitch::after{transform:translateX(20px)}
+#checkboxInput:checked+.toggleSwitch{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));border-color:transparent;box-shadow:0 0 20px var(--accent-soft)}
+.bnav{position:fixed;bottom:16px;left:16px;right:16px;background:rgba(255,255,255,0.05);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:20px;display:flex;justify-content:space-around;align-items:center;padding:6px 0;z-index:200;box-shadow:0 4px 30px rgba(0,0,0,0.5);max-width:440px;margin-left:auto;margin-right:auto}
+.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 16px;transition:0.2s;border-radius:12px;background:transparent;border:none;color:var(--txt-dim);font-family:'Inter',sans-serif;min-width:60px}
+.bnav-btn:active{transform:scale(0.90)}
+.bnav-icon{font-size:20px;transition:0.2s}
+.bnav-lbl{font-size:0.45rem;font-weight:600;letter-spacing:1px;transition:0.2s;text-transform:uppercase}
+.bnav-btn.active .bnav-icon,.bnav-btn.active .bnav-lbl{color:#fff}
+.bnav-btn.active .bnav-icon{text-shadow:0 0 20px var(--accent-soft)}
+.bnav-btn.active{background:rgba(255,255,255,0.06)}
+.tab-section{display:none;animation:fadeUp 0.5s var(--ease-smooth)}
+.tab-section.active{display:block}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+.footer{text-align:center;font-size:0.5rem;font-weight:500;color:var(--txt-dim);margin-top:18px;padding-bottom:6px;letter-spacing:2px}
+.footer .highlight{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.theme-btn{position:fixed;right:16px;bottom:82px;width:44px;height:44px;border-radius:14px;background:var(--glass);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;font-size:18px;z-index:500;cursor:pointer;box-shadow:var(--glass-shadow);transition:all 0.3s var(--ease-spring);color:var(--txt-muted)}
+.theme-btn:active{transform:scale(0.88)}
+.theme-panel{position:fixed;right:66px;bottom:76px;background:rgba(20,20,36,0.92);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:18px;padding:14px 10px;display:none;flex-direction:column;gap:8px;z-index:500;box-shadow:var(--glass-shadow);align-items:center}
+.theme-panel.open{display:flex;animation:fadeUp 0.3s var(--ease-spring)}
+.theme-panel::before{content:'COLOR';position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:0.35rem;font-weight:600;letter-spacing:2px;color:var(--txt-dim);background:rgba(20,20,36,0.92);padding:0 8px;border-radius:4px;border:1px solid var(--glass-border)}
+.thDot{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all 0.3s var(--ease-spring);flex-shrink:0;position:relative;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.thDot:active{transform:scale(0.85)}
+.thDot.on{border-color:rgba(255,255,255,0.8);box-shadow:0 0 20px currentColor}
+.th-divider{width:16px;height:1px;background:var(--glass-border);margin:2px 0}
+#musicNotif{position:fixed;top:16px;left:16px;right:16px;z-index:8000;pointer-events:none;transform:translateY(-120px) scale(0.92);opacity:0;transition:transform 0.6s var(--ease-spring),opacity 0.5s ease;will-change:transform,opacity;max-width:440px;margin:0 auto}
+#musicNotif.show{transform:translateY(0) scale(1);opacity:1;pointer-events:all}
+#musicNotif.hide{transform:translateY(-120px) scale(0.92);opacity:0;pointer-events:none;transition:transform 0.4s cubic-bezier(0.55,0,1,0.45),opacity 0.35s ease}
+.mn-inner{background:rgba(20,20,36,0.92);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:18px;padding:12px 14px 12px 12px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 40px rgba(0,0,0,0.6);position:relative;overflow:hidden}
+.mn-inner::before{content:'';position:absolute;inset:0;border-radius:18px;padding:1px;background:linear-gradient(135deg,rgba(255,255,255,0.06),transparent 60%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;pointer-events:none}
+.mn-album{width:44px;height:44px;border-radius:12px;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,var(--accent-start),var(--accent-end));display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,0.3)}
+.mn-text{flex:1;min-width:0;cursor:pointer}
+.mn-app-label{font-size:0.45rem;font-weight:600;letter-spacing:2px;color:var(--txt-muted);text-transform:uppercase;margin-bottom:1px}
+.mn-title{font-size:0.7rem;font-weight:700;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mn-sub{font-size:0.5rem;font-weight:500;color:var(--txt-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mn-close{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);color:var(--txt-dim);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+.mn-close:active{transform:scale(0.85);background:rgba(255,255,255,0.12)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:9999;align-items:flex-end;justify-content:center;opacity:0;transition:opacity 0.35s ease}
+.modal-overlay.open{opacity:1}
+.modal-sheet{background:rgba(18,18,36,0.92);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:24px 24px 0 0;padding:24px 20px 30px;width:100%;max-width:440px;max-height:80vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.4s var(--ease-spring);box-shadow:0 -10px 60px rgba(0,0,0,0.6)}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:4px;background:var(--glass-border);margin:0 auto 16px}
+.modal-title{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:16px;text-align:center;letter-spacing:-0.3px}
+#toastBox{position:fixed;bottom:80px;left:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none;max-width:440px;margin:0 auto}
+.toast{background:rgba(18,18,36,0.92);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-left:3px solid var(--accent-mid);border-radius:14px;padding:12px 16px;font-size:0.7rem;font-weight:500;color:var(--txt);display:flex;align-items:center;gap:10px;transform:translateY(80px);opacity:0;transition:0.4s var(--ease-spring);box-shadow:0 4px 30px rgba(0,0,0,0.5);pointer-events:all}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{border-left-color:#f87171;color:#fca5a5}
+#pCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5}
+@media (max-width:420px){
+.wrap{padding:8px 10px 90px}
+.hero-title{font-size:1.6rem}
+.glass-card{padding:20px 16px;border-radius:24px}
+.url-input{font-size:0.85rem;padding:14px 140px 14px 42px}
+.input-action-btn{font-size:0.5rem;padding:4px 8px}
+.btn-glass{font-size:0.7rem;padding:12px 12px}
+.bnav{padding:4px 0;bottom:12px;left:12px;right:12px}
+.bnav-btn{padding:4px 12px;min-width:50px}
+}
+@media (max-width:360px){.logo-text{font-size:1rem;letter-spacing:1px}.hero-title{font-size:1.4rem}}
+</style>
+</head>
+<body>
+
+<div class="bg-gradient"></div>
+<canvas id="pCanvas"></canvas>
+
+<div id="preloader">
+    <div class="pl-badge">// initializing</div>
+    <div class="pl-logo" id="pl-logo-text"></div>
+    <div class="pl-track"><div class="pl-fill"></div></div>
+    <div class="pl-pct" id="plPct">0%</div>
+</div>
+
+<div class="theme-btn" id="mobThemeBtn" onclick="toggleThemePanel()"><i class="ti ti-palette"></i></div>
+<div class="theme-panel" id="mobThemePanel">
+    <div class="thDot" style="background:#7c3aed;color:#7c3aed" data-c="#7c3aed" onclick="setTheme('#7c3aed',this)"></div>
+    <div class="thDot" style="background:#ec4899;color:#ec4899" data-c="#ec4899" onclick="setTheme('#ec4899',this)"></div>
+    <div class="thDot" style="background:#06b6d4;color:#06b6d4" data-c="#06b6d4" onclick="setTheme('#06b6d4',this)"></div>
+    <div class="th-divider"></div>
+    <div class="thDot" style="background:#f59e0b;color:#f59e0b" data-c="#f59e0b" onclick="setTheme('#f59e0b',this)"></div>
+    <div class="thDot" style="background:#10b981;color:#10b981" data-c="#10b981" onclick="setTheme('#10b981',this)"></div>
+    <div class="thDot" style="background:#ef4444;color:#ef4444" data-c="#ef4444" onclick="setTheme('#ef4444',this)"></div>
+</div>
+
+<div id="musicNotif">
+    <div class="mn-inner" id="mnInner">
+        <div class="mn-album" id="mnAlbum"><i class="ti ti-mail"></i></div>
+        <div class="mn-text" onclick="openNotifMessage()">
+            <div class="mn-app-label">New Message</div>
+            <div class="mn-title" id="mnTitle">No Subject</div>
+            <div class="mn-sub" id="mnSubText">From: sender</div>
+        </div>
+        <button class="mn-close" onclick="mnClose()"><i class="ti ti-x"></i></button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal-sheet" id="edit-modal-content">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Edit Email Prefix</div>
+        <p style="color:var(--txt-muted);font-size:0.8rem;text-align:center;margin-bottom:16px;">Choose a custom name for your email</p>
+        <div style="position:relative;margin-bottom:18px;">
+            <i class="ti ti-pencil" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--txt-dim);font-size:16px;"></i>
+            <input type="text" id="custom-prefix-input" placeholder="Enter gmail name" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:12px;padding:12px 14px 12px 40px;color:#fff;font-family:'Inter',sans-serif;font-size:0.9rem;outline:none;transition:0.3s;" onfocus="this.style.borderColor='var(--accent-mid)'" onblur="this.style.borderColor='var(--glass-border)'" />
+        </div>
+        <div style="display:flex;gap:10px;">
+            <button class="btn-glass secondary" onclick="closeEditModal()" style="flex:1;">Cancel</button>
+            <button class="btn-glass primary" onclick="submitEditModal()" style="flex:1;">Generate</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="history-modal">
+    <div class="modal-sheet" id="history-modal-content">
+        <div class="modal-handle"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="modal-title" style="margin:0;">Email History</div>
+            <button onclick="closeHistoryModal()" style="background:none;border:none;color:var(--txt-dim);font-size:20px;cursor:pointer;"><i class="ti ti-x"></i></button>
+        </div>
+        <div id="history-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+        <button onclick="clearHistory()" style="width:100%;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);color:#f87171;padding:12px;border-radius:12px;font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:1px;cursor:pointer;transition:0.2s;">Clear History</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="custom-confirm-modal">
+    <div class="modal-sheet" id="custom-confirm-content" style="max-width:340px;border-radius:24px;text-align:center;">
+        <div class="modal-handle"></div>
+        <div class="modal-title" id="custom-confirm-title">Title</div>
+        <p style="color:var(--txt-muted);font-size:0.85rem;margin-bottom:20px;" id="custom-confirm-text">Text</p>
+        <div style="display:flex;gap:10px;">
+            <button id="custom-confirm-cancel" class="btn-glass secondary" style="flex:1;">Cancel</button>
+            <button id="custom-confirm-ok" class="btn-glass primary" style="flex:1;">OK</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="custom-prompt-modal">
+    <div class="modal-sheet" id="custom-prompt-content" style="max-width:340px;border-radius:24px;">
+        <div class="modal-handle"></div>
+        <div class="modal-title" id="custom-prompt-title">Title</div>
+        <input type="text" id="custom-prompt-input" placeholder="e.g. Netflix, Gaming..." style="width:100%;padding:12px;margin-bottom:18px;background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:12px;color:#fff;font-family:'Inter',sans-serif;outline:none;transition:0.3s;" onfocus="this.style.borderColor='var(--accent-mid)'" onblur="this.style.borderColor='var(--glass-border)'" />
+        <div style="display:flex;gap:10px;">
+            <button id="custom-prompt-cancel" class="btn-glass secondary" style="flex:1;">Cancel</button>
+            <button id="custom-prompt-ok" class="btn-glass primary" style="flex:1;">Save</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastBox"></div>
+
+<nav class="bnav">
+    <button class="bnav-btn active" onclick="showTab('home',this)"><i class="ti ti-home bnav-icon"></i><span class="bnav-lbl">Home</span></button>
+    <button class="bnav-btn" onclick="showTab('faq',this)"><i class="ti ti-settings bnav-icon"></i><span class="bnav-lbl">Settings</span></button>
+</nav>
+
+<div class="wrap">
+    <div class="top-bar">
+        <div class="logo-row">
+            <div class="logo-icon"><img id="header-logo-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:none;" /><i class="ti ti-mail" id="header-logo-ico"></i></div>
+            <span class="logo-text" id="header-logo-text"></span>
+        </div>
+        <div class="top-actions">
+            <button class="top-btn" onclick="openHistoryModal()"><i class="ti ti-history"></i></button>
+        </div>
+    </div>
+
+    <div class="tab-section active" id="tab-home">
+        <div class="glass-card">
+            <div class="hero-eyebrow"><span class="pulse-dot"></span><span class="eyebrow-text">Temp Mail · Unlimited · Free</span></div>
+            <div class="hero-title"><span class="highlight">Temp</span> Mail</div>
+            <p class="hero-sub">Get a secure, temporary email address instantly. Perfect for <span class="highlight">protecting your privacy</span>, avoiding spam, and keeping your personal inbox clean.</p>
+            <div class="input-wrap">
+                <i class="ti ti-mail input-left-icon"></i>
+                <input class="url-input" type="text" id="email-address" readonly placeholder="Generating email..." />
+                <div class="input-actions">
+                    <button class="input-action-btn edit-btn" id="editBtn" onclick="promptCustomUsername()"><i class="ti ti-pencil"></i> Edit</button>
+                    <button class="input-action-btn copy-btn" id="copyBtn" onclick="copyEmail()"><i class="ti ti-copy"></i> Copy</button>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-glass primary" id="generate-btn" onclick="generateEmail()"><i class="ti ti-refresh"></i> Generate New</button>
+                <button class="btn-glass secondary" id="share-btn" onclick="shareMailbox()"><i class="ti ti-share"></i> Share</button>
+            </div>
+            <div class="status-box loading" id="loader" style="display:flex;">
+                <div class="spinner"></div>
+                <span id="status-text">Generating new email address...</span>
+            </div>
+            <div class="status-box error" id="error-box" style="display:none;">
+                <i class="ti ti-alert-circle"></i>
+                <span id="error-msg">Something went wrong.</span>
+            </div>
+        </div>
+
+        <div class="glass-card" id="inbox-section">
+            <div class="inbox-header">
+                <div class="hero-eyebrow" style="margin:0;"><span class="pulse-dot"></span><span class="eyebrow-text">Inbox</span></div>
+                <span class="inbox-count" id="inbox-count">0</span>
+            </div>
+            <div id="email-list"></div>
+            <div id="email-content">
+                <div class="email-content-header">
+                    <button class="btn-back" onclick="closeEmail()"><i class="ti ti-arrow-left"></i> Back</button>
+                    <button class="btn-copy-otp" onclick="copyOTP()"><i class="ti ti-copy"></i> Copy OTP</button>
+                </div>
+                <div id="email-subject"></div>
+                <div id="email-sender"></div>
+                <div id="email-body"></div>
+            </div>
+        </div>
+
+        <p class="footer">© 2026 <span class="site-name-dynamic highlight"></span> · For personal use only</p>
+    </div>
+
+    <div class="tab-section" id="tab-faq">
+        <div class="glass-card">
+            <div class="section-label">Settings</div>
+            <div class="toggle-row">
+                <span class="label">Show Loading Screen</span>
+                <div>
+                    <input type="checkbox" id="checkboxInput" onchange="togglePreloaderSetting()" />
+                    <label for="checkboxInput" class="toggleSwitch"></label>
+                </div>
+            </div>
+            <div class="section-label">FAQ</div>
+            <div class="s-div"></div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-txt">Is <span class="site-name-dyn-text"></span> completely free?</span><i class="ti ti-chevron-down faq-arr"></i></div>
+                    <div class="faq-a">Yes! <span class="site-name-dyn-text"></span> is 100% free. No registration, no subscription, no hidden fees. Just generate an email and use it.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-txt">Is it safe for Social Media &amp; premium sites?</span><i class="ti ti-chevron-down faq-arr"></i></div>
+                    <div class="faq-a">Absolutely. Our system uses premium domains optimized to bypass strict spam filters, ensuring you can sign up anywhere securely without revealing your real identity.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-txt">Will I lose my email if I close the tab?</span><i class="ti ti-chevron-down faq-arr"></i></div>
+                    <div class="faq-a">No! Your active email and previous sessions are securely saved in your browser. You can always access and restore your past emails using the "History" feature until you manually clear them.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-txt">Is there a limit to how many emails I can receive?</span><i class="ti ti-chevron-down faq-arr"></i></div>
+                    <div class="faq-a">No limits! You can receive as many verification codes, links, and messages as you need, completely for free.</div>
+                </div>
+            </div>
+        </div>
+        <p class="footer">© 2026 <span class="site-name-dynamic highlight"></span> · For personal use only</p>
+    </div>
+</div>
+
+<script>
+// ── SAFE STORAGE ──
+const LS = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function jget(k, d) { try { return JSON.parse(LS.get(k) || d); } catch (e) { return JSON.parse(d); } }
+
+// ── DYNAMIC SITE NAME ──
+(function() {
+    const name = document.title || 'ZTempPro';
+    function styleName(n) {
+        if (!n) return n;
+        if (n.length === 1) return `<span class="logo-char r">${n}</span>`;
+        if (n.length === 2) return `<span class="logo-char">${n[0]}</span><span class="logo-char r">${n[1]}</span>`;
+        const mid = Math.floor(n.length / 2);
+        return n.split('').map((ch, i) => i === mid ? `<span class="logo-char r">${ch}</span>` : `<span class="logo-char">${ch}</span>`).join('');
+    }
+    const pl = document.getElementById('pl-logo-text');
+    const hd = document.getElementById('header-logo-text');
+    if (pl) pl.innerHTML = styleName(name);
+    if (hd) hd.innerHTML = styleName(name);
+    document.querySelectorAll('.site-name-dynamic').forEach(el => el.textContent = name);
+    document.querySelectorAll('.site-name-dyn-text').forEach(el => el.textContent = name);
+    for (let node of document.head.childNodes) {
+        if (node.nodeType === 8) {
+            const txt = node.textContent.trim();
+            if (txt.startsWith('PROFILE_PIC:')) {
+                const pic = txt.replace('PROFILE_PIC:', '').trim();
+                const img = document.getElementById('header-logo-img');
+                if (img && pic) { img.src = pic; img.style.display = 'block'; const ic = document.getElementById('header-logo-ico'); if (ic) ic.style.display = 'none'; }
+            }
+        }
+    }
+})();
+
+// ── PRELOADER ──
+function togglePreloaderSetting() {
+    const chk = document.getElementById('checkboxInput');
+    if (chk.checked) LS.del('ffx_hide_preloader');
+    else LS.set('ffx_hide_preloader', 'true');
+}
+(function() {
+    const chk = document.getElementById('checkboxInput');
+    if (chk) chk.checked = LS.get('ffx_hide_preloader') !== 'true';
+    if (LS.get('ffx_hide_preloader') === 'true') {
+        const pl = document.getElementById('preloader');
+        if (pl) pl.style.display = 'none';
+        return;
+    }
+    let p = 0;
+    const pct = document.getElementById('plPct');
+    const iv = setInterval(() => {
+        p += Math.random() * 18 + 5;
+        if (p >= 100) { p = 100; clearInterval(iv); setTimeout(() => { document.getElementById('preloader').classList.add('out'); }, 300); }
+        pct.textContent = Math.floor(p) + '%';
+    }, 100);
+})();
+
+// ── PARTICLES ──
+(function() {
+    const c = document.getElementById('pCanvas');
+    const ctx = c.getContext('2d');
+    let W, H;
+    function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+    let accentColor = '#7c3aed';
+    window._updateParticleColor = function(col) { accentColor = col; };
+    const pts = Array.from({ length: 35 }, () => ({
+        x: Math.random() * 1400, y: Math.random() * 900,
+        r: Math.random() * 1.5 + 0.5,
+        dx: (Math.random() - .5) * 0.25, dy: (Math.random() - .5) * 0.25,
+        a: Math.random() * 0.25 + 0.1
+    }));
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (let p of pts) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = accentColor;
+            ctx.globalAlpha = p.a;
+            ctx.fill();
+            p.x += p.dx; p.y += p.dy;
+            if (p.x < 0) p.x = W;
+            if (p.x > W) p.x = 0;
+            if (p.y < 0) p.y = H;
+            if (p.y > H) p.y = 0;
+        }
+        ctx.globalAlpha = 1;
+        for (let i = 0; i < pts.length; i++) {
+            for (let j = i + 1; j < pts.length; j++) {
+                const a = pts[i], b = pts[j];
+                const d = Math.hypot(a.x - b.x, a.y - b.y);
+                if (d < 70) {
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.strokeStyle = accentColor;
+                    ctx.globalAlpha = (1 - d / 70) * 0.06;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+
+// ── THEME ──
+function applyTheme(c, save) {
+    const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16);
+    const root = document.documentElement;
+    root.style.setProperty('--accent-start', c);
+    root.style.setProperty('--accent-mid', c);
+    root.style.setProperty('--accent-end', c);
+    root.style.setProperty('--accent-solid', c);
+    root.style.setProperty('--accent-soft', `rgba(${r},${g},${b},0.15)`);
+    const tm = document.querySelector('meta[name="theme-color"]');
+    if (tm) tm.content = c;
+    document.querySelectorAll('.thDot').forEach(d => d.classList.toggle('on', d.getAttribute('data-c') === c));
+    if (window._updateParticleColor) window._updateParticleColor(c);
+    if (save) LS.set((document.title || 'FFX') + '_theme', c);
+}
+function setTheme(c, el) { applyTheme(c, true); toggleThemePanel(); toastMsg('Theme updated!'); }
+function toggleThemePanel() { document.getElementById('mobThemePanel').classList.toggle('open'); }
+(function() {
+    const saved = LS.get((document.title || 'FFX') + '_theme');
+    applyTheme(saved || '#7c3aed', false);
+})();
+
+// ── TABS ──
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── FAQ ──
+function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+}
+
+// ── TOAST ──
+function toastMsg(msg, err = false) {
+    const b = document.getElementById('toastBox');
+    const t = document.createElement('div');
+    t.className = 'toast' + (err ? ' err' : '');
+    t.innerHTML = `<span>${err ? '⚠' : '✓'}</span> ${esc(msg)}`;
+    b.appendChild(t);
+    requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 500); }, 3200);
+}
+
+// ── COPY ──
+function copyFallback(text, successMsg) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); toastMsg(successMsg); } catch (e) { toastMsg('Failed to copy', true); }
+    document.body.removeChild(ta);
+}
+function copyText(text, msg) {
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => toastMsg(msg)).catch(() => copyFallback(text, msg));
+    } else copyFallback(text, msg);
+}
+function copyEmail() {
+    const el = document.getElementById('email-address');
+    if (!el || !el.value || el.value.includes('...')) { toastMsg('No email to copy!', true); return; }
+    copyText(el.value, 'Email copied!');
+}
+function copyOTP() {
+    const bodyEl = document.getElementById('email-body');
+    let text = '';
+    const iframe = bodyEl.querySelector('iframe');
+    if (iframe) { try { text = iframe.contentWindow.document.body.innerText; } catch (e) { text = ''; } }
+    else text = bodyEl.innerText;
+    if (!text || !text.trim()) { toastMsg('No content to copy!', true); return; }
+    let code = null;
+    const fbMatch = text.match(/FB-\d{5,8}/i);
+    const digitMatch = text.match(/\b\d{5,8}\b/);
+    if (fbMatch) code = fbMatch[0];
+    else if (digitMatch) code = digitMatch[0];
+    if (code) copyText(code, `Code ${code} copied!`);
+    else copyText(text, 'Full message copied!');
+}
+
+// ── API (smails.dev — same as the Telegram bot) ──
+// Put your Vercel proxy URL here, e.g. 'https://YOUR-SITE.vercel.app/api/smails'
+const PROXY = '';
+const U = path => PROXY ? PROXY + '?p=' + encodeURIComponent(path) : 'https://smails.dev/api/mailbox' + path;
+const AUTH = t => ({ 'Authorization': 'Bearer ' + t });
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function tfetch(url, opt = {}, ms = 12000) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms);
+    try { return await fetch(url, { ...opt, signal: ctrl.signal }); }
+    catch (e) { throw new Error(e.name === 'AbortError' ? 'Network timeout' : 'Network/CORS error'); }
+    finally { clearTimeout(t); }
+}
+const asList = d => Array.isArray(d) ? d : ((d && (d.messages || d.data)) || []);
+
+let currentAccount = null, currentSidToken = null, checkInterval = null;
+let seenMessages = new Set(), currentNotifMsgId = null, isGenerating = false;
+
+async function generateEmail(customPrefix = null) {
+    if (isGenerating) return;
+    isGenerating = true;
+    const loader = document.getElementById('loader');
+    const errorBox = document.getElementById('error-box');
+    const emailInput = document.getElementById('email-address');
+    const genBtn = document.getElementById('generate-btn');
+    clearInterval(checkInterval);
+    document.getElementById('email-list').innerHTML = '';
+    closeEmail();
+    seenMessages.clear();
+    errorBox.style.display = 'none';
+    loader.style.display = 'flex';
+    genBtn.disabled = true;
+    emailInput.value = 'Generating...';
+    document.getElementById('status-text').innerText = 'Creating mailbox...';
+    try {
+        const opt = { method: 'POST' };
+        if (customPrefix) {
+            const p = customPrefix.toLowerCase().replace(/[^a-z0-9]/g, '');
+            opt.headers = { 'Content-Type': 'application/json' };
+            opt.body = JSON.stringify({ username: p, name: p, prefix: p });
+        }
+        let res = await tfetch(U(''), opt);
+        if (res.status === 429) { await sleep(2500); res = await tfetch(U(''), opt); }
+        if (!res.ok) throw new Error('Create failed ' + res.status);
+        const data = await res.json();
+        if (!data || !data.address || !data.token) throw new Error('Bad response from server');
+        currentAccount = data.address;
+        currentSidToken = data.token;
+        emailInput.value = data.address;
+        loader.style.display = 'none';
+        toastMsg('Mailbox created!');
+        if (customPrefix && !data.address.toLowerCase().startsWith(customPrefix.toLowerCase().replace(/[^a-z0-9]/g, '')))
+            toastMsg('Custom name not supported by this API', true);
+        saveSession(currentAccount, currentSidToken);
+        checkMessages();
+        checkInterval = setInterval(checkMessages, 7000);
+    } catch (e) {
+        loader.style.display = 'none';
+        document.getElementById('error-msg').innerText = e.message || 'Error generating email.';
+        errorBox.style.display = 'flex';
+        emailInput.value = currentAccount || '';
+        if (currentAccount && currentSidToken) checkInterval = setInterval(checkMessages, 7000);
+    }
+    genBtn.disabled = false;
+    isGenerating = false;
+}
+
+function getLogo(senderEmail, senderName, subject) {
+    const str = (senderEmail + ' ' + (senderName || '') + ' ' + (subject || '')).toLowerCase();
+    let domain = null;
+    const map = { facebook: 'facebook.com', meta: 'facebook.com', instagram: 'instagram.com', netflix: 'netflix.com', google: 'google.com', youtube: 'google.com', apple: 'apple.com', amazon: 'amazon.com', twitter: 'x.com', discord: 'discord.com', spotify: 'spotify.com', paypal: 'paypal.com', steam: 'steampowered.com', epic: 'epicgames.com', microsoft: 'microsoft.com', xbox: 'microsoft.com', github: 'github.com', chatgpt: 'openai.com', openai: 'openai.com', linkedin: 'linkedin.com', roblox: 'roblox.com', uber: 'uber.com', tiktok: 'tiktok.com', telegram: 'telegram.org' };
+    for (const [k, v] of Object.entries(map)) { if (str.includes(k)) { domain = v; break; } }
+    if (domain) return `https://logo.clearbit.com/${domain}?size=64`;
+    const p = senderEmail.split('@');
+    if (p.length === 2 && !p[1].includes('mail') && !p[1].includes('reply') && !p[1].includes('bounce'))
+        return `https://logo.clearbit.com/${p[1]}?size=64`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(senderName || p[0] || 'A')}&background=7c3aed&color=fff&rounded=true&bold=true`;
+}
+
+async function checkMessages() {
+    if (!currentSidToken) return;
+    try {
+        const res = await tfetch(U('/messages'), { headers: AUTH(currentSidToken) });
+        if (!res.ok) {
+            if (res.status === 401) { clearInterval(checkInterval); currentSidToken = null; generateEmail(); }
+            return;
+        }
+        const messages = asList(await res.json());
+        const listEl = document.getElementById('email-list');
+        document.getElementById('inbox-count').textContent = messages.length;
+        if (!messages.length) {
+            listEl.innerHTML = `<div class="email-empty"><div class="wait-loader"></div>Waiting for incoming emails...</div>`;
+            return;
+        }
+        listEl.innerHTML = '';
+        messages.forEach(msg => {
+            const fromAddr = String(msg.from_addr || (msg.from && msg.from.address) || 'unknown');
+            const fromName = msg.from_name || (msg.from && msg.from.name) || '';
+            if (!seenMessages.has(msg.id)) {
+                seenMessages.add(msg.id);
+                showEmailNotif({ id: msg.id, subject: msg.subject, from: { address: fromAddr } });
+            }
+            const item = document.createElement('div');
+            item.className = 'email-item';
+            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(fromAddr.split('@')[0] || 'M')}&background=7c3aed&color=fff&rounded=true&bold=true`;
+            item.innerHTML = `
+                <img src="${esc(getLogo(fromAddr, fromName, msg.subject))}" class="avatar" alt="">
+                <div class="body">
+                  <div class="subject">${esc(msg.subject || 'No Subject')}</div>
+                  <div class="sender">${esc(fromAddr)}</div>
+                </div>
+                <div class="arrow"><i class="ti ti-chevron-right"></i></div>`;
+            item.querySelector('img').onerror = function() { this.onerror = null; this.src = fallback; };
+            item.onclick = () => viewMessage(msg.id);
+            listEl.appendChild(item);
+        });
+    } catch (e) { console.error(e); }
+}
+
+async function viewMessage(id) {
+    if (!currentSidToken) return;
+    const loader = document.getElementById('loader');
+    loader.style.display = 'flex';
+    document.getElementById('status-text').innerText = 'Loading message...';
+    try {
+        const res = await tfetch(U('/messages/' + encodeURIComponent(id)), { headers: AUTH(currentSidToken) });
+        if (!res.ok) throw new Error('Failed to load message');
+        const msg = await res.json();
+        document.getElementById('email-list').style.display = 'none';
+        document.getElementById('email-content').style.display = 'block';
+        document.getElementById('email-subject').innerText = msg.subject || 'No Subject';
+        const fromAddr = msg.from_addr || (msg.from && msg.from.address) || 'unknown';
+        const d = new Date(msg.created_at || msg.createdAt || msg.received_at || '');
+        document.getElementById('email-sender').innerText = `From: ${fromAddr}` + (isNaN(d) ? '' : ' · ' + d.toLocaleString());
+        const bodyEl = document.getElementById('email-body');
+        bodyEl.innerHTML = '';
+        const html = Array.isArray(msg.html) ? msg.html.join('') : (msg.html || '');
+        if (html) {
+            const iframe = document.createElement('iframe');
+            iframe.style.cssText = 'width:100%;min-height:280px;border:none;border-radius:10px;background:#fff;';
+            iframe.setAttribute('sandbox', 'allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+            bodyEl.appendChild(iframe);
+            iframe.srcdoc = '<meta name="viewport" content="width=device-width,initial-scale=1.0"><base target="_blank"><style>body{margin:0;padding:15px;font-family:-apple-system,sans-serif;background:#fff;color:#222;}img{max-width:100%;height:auto;}</style>' + html;
+            const adjust = () => { try { const h = iframe.contentWindow.document.documentElement.scrollHeight; if (h > 50) iframe.style.height = h + 'px'; } catch (e) {} };
+            iframe.onload = () => { adjust(); setTimeout(adjust, 1000); setTimeout(adjust, 3000); };
+        } else if (msg.text) bodyEl.innerHTML = `<pre>${esc(msg.text)}</pre>`;
+        else bodyEl.textContent = 'Empty message.';
+    } catch (e) { toastMsg('Failed to load message', true); }
+    loader.style.display = 'none';
+}
+
+function closeEmail() {
+    document.getElementById('email-list').style.display = 'flex';
+    document.getElementById('email-content').style.display = 'none';
+}
+
+// ── EDIT PREFIX ──
+function promptCustomUsername() {
+    const modal = document.getElementById('edit-modal');
+    document.getElementById('custom-prefix-input').value = '';
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => modal.classList.add('open'));
+    setTimeout(() => document.getElementById('custom-prefix-input').focus(), 300);
+}
+function closeEditModal() {
+    const modal = document.getElementById('edit-modal');
+    modal.classList.remove('open');
+    setTimeout(() => { modal.style.display = 'none'; }, 400);
+}
+function submitEditModal() {
+    const name = document.getElementById('custom-prefix-input').value.trim();
+    if (name) { closeEditModal(); generateEmail(name); }
+    else toastMsg('Prefix cannot be empty!', true);
+}
+
+// ── SHARE ──
+function shareMailbox() {
+    if (!currentAccount || !currentSidToken) { toastMsg('No mailbox active!', true); return; }
+    const url = location.origin + location.pathname + '#e=' + encodeURIComponent(currentAccount) + '&t=' + encodeURIComponent(currentSidToken);
+    copyText(url, 'Share link copied!');
+}
+
+// ── LOGIN FROM LINK (bot / share) ──
+async function loginToMailbox(address, token) {
+    const loader = document.getElementById('loader');
+    const emailInput = document.getElementById('email-address');
+    const genBtn = document.getElementById('generate-btn');
+    clearInterval(checkInterval);
+    document.getElementById('email-list').innerHTML = '';
+    closeEmail();
+    seenMessages.clear();
+    document.getElementById('error-box').style.display = 'none';
+    loader.style.display = 'flex';
+    document.getElementById('status-text').innerText = 'Opening your mailbox...';
+    genBtn.disabled = true;
+    emailInput.value = 'Connecting...';
+    try {
+        const res = await tfetch(U('/messages'), { headers: AUTH(token) });
+        if (!res.ok) throw new Error('Link expired or invalid');
+        currentAccount = address;
+        currentSidToken = token;
+        emailInput.value = address;
+        loader.style.display = 'none';
+        genBtn.disabled = false;
+        toastMsg('Mailbox opened!');
+        saveSession(address, token);
+        checkMessages();
+        checkInterval = setInterval(checkMessages, 7000);
+    } catch (e) {
+        genBtn.disabled = false;
+        toastMsg(e.message, true);
+        setTimeout(generateEmail, 1200);
+    }
+}
+
+// ── SESSION ──
+function saveSession(address, token) {
+    const old = jget('ffx_mail_history', '[]').find(i => i.address === address);
+    const data = { v: 2, address, token, timestamp: Date.now() };
+    if (old && old.customName) data.customName = old.customName;
+    LS.set('ffx_saved_mail', JSON.stringify(data));
+    let history = jget('ffx_mail_history', '[]').filter(i => i.address !== address);
+    history.unshift(data);
+    if (history.length > 20) history.pop();
+    LS.set('ffx_mail_history', JSON.stringify(history));
+}
+
+async function restoreSessionData(data) {
+    clearInterval(checkInterval);
+    document.getElementById('email-list').innerHTML = '';
+    closeEmail();
+    seenMessages.clear();
+    document.getElementById('error-box').style.display = 'none';
+    try {
+        const res = await tfetch(U('/messages'), { headers: AUTH(data.token) });
+        if (!res.ok) { generateEmail(); return; }
+    } catch (e) {}
+    currentAccount = data.address;
+    currentSidToken = data.token;
+    document.getElementById('email-address').value = data.address;
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('generate-btn').disabled = false;
+    toastMsg('Session restored!');
+    saveSession(currentAccount, currentSidToken);
+    checkMessages();
+    checkInterval = setInterval(checkMessages, 10000);
+}
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+    // drop old mail.gw sessions
+    LS.set('ffx_mail_history', JSON.stringify(jget('ffx_mail_history', '[]').filter(i => i.v === 2)));
+    if (location.hash.length > 1) {
+        const hp = new URLSearchParams(location.hash.slice(1));
+        const e = hp.get('e'), t = hp.get('t');
+        if (e && t) {
+            history.replaceState(null, '', location.pathname + location.search); // hide token from URL bar
+            loginToMailbox(e, t);
+            return;
+        }
+    }
+    try {
+        const data = JSON.parse(LS.get('ffx_saved_mail') || 'null');
+        if (data && data.v === 2 && data.address && data.token) { restoreSessionData(data); return; }
+    } catch (e) {}
+    setTimeout(generateEmail, 1500);
+});
+
+// ── NOTIFICATION ──
+(function() {
+    let autoHide = null;
+    const notif = document.getElementById('musicNotif');
+    const inner = document.getElementById('mnInner');
+    window.showEmailNotif = function(msg) {
+        document.getElementById('mnTitle').innerText = msg.subject || 'No Subject';
+        document.getElementById('mnSubText').innerText = 'From: ' + msg.from.address;
+        currentNotifMsgId = msg.id;
+        notif.classList.remove('hide');
+        notif.classList.add('show');
+        clearTimeout(autoHide);
+        autoHide = setTimeout(() => mnClose(), 5000);
+    };
+    window.openNotifMessage = function() {
+        if (currentNotifMsgId) { viewMessage(currentNotifMsgId); mnClose(); }
+    };
+    window.mnClose = function() {
+        clearTimeout(autoHide);
+        notif.classList.remove('show');
+        notif.classList.add('hide');
+    };
+    let touchStart = 0;
+    inner.addEventListener('touchstart', (e) => { touchStart = e.touches[0].clientY; }, { passive: true });
+    inner.addEventListener('touchmove', (e) => {
+        const dy = e.touches[0].clientY - touchStart;
+        if (dy > 20) { notif.style.transform = `translateY(${dy}px)`; notif.style.transition = 'none'; }
+    }, { passive: true });
+    inner.addEventListener('touchend', (e) => {
+        const dy = e.changedTouches[0].clientY - touchStart;
+        notif.style.transition = '';
+        if (dy > 60) mnClose(); else notif.style.transform = '';
+    });
+})();
+
+// ── HISTORY MODAL ──
+function openHistoryModal() {
+    const modal = document.getElementById('history-modal');
+    const list = document.getElementById('history-list');
+    const history = jget('ffx_mail_history', '[]');
+    list.innerHTML = '';
+    if (history.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--txt-dim);font-size:0.8rem;">No history found.</div>';
+    } else {
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);padding:14px;border-radius:14px;cursor:pointer;transition:0.2s;position:relative;';
+            if (currentAccount === item.address) {
+                div.style.borderColor = 'var(--accent-soft)';
+                div.style.background = 'rgba(255,255,255,0.06)';
+            }
+            div.onmouseover = () => div.style.background = 'rgba(255,255,255,0.08)';
+            div.onmouseout = () => div.style.background = (currentAccount === item.address) ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)';
+            div.onclick = (e) => {
+                if (e.target.closest('.hist-action')) return;
+                closeHistoryModal();
+                if (currentAccount !== item.address) restoreSessionData(item);
+            };
+            const dateStr = new Date(item.timestamp).toLocaleString();
+            const custom = item.customName ? `<div style="font-size:0.7rem;font-weight:600;color:var(--accent-mid);margin-bottom:4px;">${esc(item.customName)}</div>` : '';
+            div.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div style="flex:1;min-width:0;">
+                    ${custom}
+                    <div style="font-size:0.8rem;font-weight:600;color:#fff;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(item.address)}</div>
+                    <div style="font-size:0.55rem;color:var(--txt-dim);">${esc(dateStr)}</div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-shrink:0;">
+                    <button class="hist-action hist-rename" style="background:rgba(16,185,129,0.08);border:none;color:#34d399;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:14px;"><i class="ti ti-pencil"></i></button>
+                    <button class="hist-action hist-delete" style="background:rgba(239,68,68,0.08);border:none;color:#f87171;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:14px;"><i class="ti ti-trash"></i></button>
+                  </div>
+                </div>`;
+            div.querySelector('.hist-rename').onclick = () => renameHistoryItem(item.address);
+            div.querySelector('.hist-delete').onclick = () => deleteHistoryItem(item.address);
+            list.appendChild(div);
+        });
+    }
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => modal.classList.add('open'));
+}
+function closeHistoryModal() {
+    const modal = document.getElementById('history-modal');
+    modal.classList.remove('open');
+    setTimeout(() => { modal.style.display = 'none'; }, 400);
+}
+
+function showConfirmModal(title, text, onOk) {
+    const m = document.getElementById('custom-confirm-modal');
+    document.getElementById('custom-confirm-title').innerText = title;
+    document.getElementById('custom-confirm-text').innerText = text;
+    document.getElementById('custom-confirm-ok').onclick = () => { closeConfirmModal(); onOk(); };
+    document.getElementById('custom-confirm-cancel').onclick = closeConfirmModal;
+    m.style.display = 'flex';
+    requestAnimationFrame(() => m.classList.add('open'));
+}
+function closeConfirmModal() {
+    const m = document.getElementById('custom-confirm-modal');
+    m.classList.remove('open');
+    setTimeout(() => { m.style.display = 'none'; }, 400);
+}
+
+function showPromptModal(title, defaultVal, onOk) {
+    const m = document.getElementById('custom-prompt-modal');
+    const input = document.getElementById('custom-prompt-input');
+    document.getElementById('custom-prompt-title').innerText = title;
+    input.value = defaultVal || '';
+    document.getElementById('custom-prompt-ok').onclick = () => { closePromptModal(); onOk(input.value); };
+    document.getElementById('custom-prompt-cancel').onclick = closePromptModal;
+    m.style.display = 'flex';
+    requestAnimationFrame(() => { m.classList.add('open'); input.focus(); });
+}
+function closePromptModal() {
+    const m = document.getElementById('custom-prompt-modal');
+    m.classList.remove('open');
+    setTimeout(() => { m.style.display = 'none'; }, 400);
+}
+
+function clearHistory() {
+    showConfirmModal('Clear History?', 'Are you sure you want to clear your entire email history?', () => {
+        LS.del('ffx_mail_history');
+        LS.del('ffx_saved_mail');
+        openHistoryModal();
+        toastMsg('History cleared!');
+    });
+}
+function deleteHistoryItem(address) {
+    showConfirmModal('Delete Email?', 'Are you sure you want to delete this email from history?', () => {
+        let history = jget('ffx_mail_history', '[]');
+        history = history.filter(item => item.address !== address);
+        LS.set('ffx_mail_history', JSON.stringify(history));
+        if (currentAccount === address) LS.del('ffx_saved_mail');
+        openHistoryModal();
+        toastMsg('Email deleted!');
+    });
+}
+function renameHistoryItem(address) {
+    const history = jget('ffx_mail_history', '[]');
+    const item = history.find(i => i.address === address);
+    if (!item) return;
+    showPromptModal('Name This Email', item.customName || '', (newName) => {
+        item.customName = newName.trim();
+        LS.set('ffx_mail_history', JSON.stringify(history));
+        const saved = jget('ffx_saved_mail', '{}');
+        if (saved.address === address) { saved.customName = item.customName; LS.set('ffx_saved_mail', JSON.stringify(saved)); }
+        openHistoryModal();
+        toastMsg('Name saved!');
+    });
+}
+
+// ── CLOSE MODALS ON OVERLAY CLICK ──
+document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', (e) => {
+        if (e.target === m) {
+            if (m.id === 'edit-modal') closeEditModal();
+            else if (m.id === 'history-modal') closeHistoryModal();
+            else if (m.id === 'custom-confirm-modal') closeConfirmModal();
+            else if (m.id === 'custom-prompt-modal') closePromptModal();
+        }
+    });
+});
+</script>
+</body>
+</html>
