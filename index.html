@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0a0a14" />
 <meta name="referrer" content="no-referrer" />
 <title>Get More Mail</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
@@ -23,7 +24,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 #preloader{position:fixed;inset:0;background:var(--bg-base);z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity 0.8s ease,visibility 0.8s}
 #preloader.out{opacity:0;visibility:hidden}
 .pl-badge{font-size:0.55rem;letter-spacing:4px;color:var(--txt-muted);margin-bottom:20px;text-transform:uppercase;font-weight:500;opacity:0.4}
-.pl-logo{font-size:2.8rem;font-weight:900;letter-spacing:4px;color:#fff;text-transform:uppercase;display:flex;align-items:baseline;gap:2px}
+.pl-logo{font-size:clamp(1.3rem,7.5vw,2.8rem);max-width:96vw;font-weight:900;letter-spacing:4px;color:#fff;text-transform:uppercase;display:flex;align-items:baseline;gap:2px}
 .pl-logo .r{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .pl-track{width:180px;height:2px;background:rgba(255,255,255,0.06);margin-top:24px;border-radius:4px;overflow:hidden}
 .pl-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));border-radius:4px;animation:plFill 2s cubic-bezier(0.4,0,0.2,1) forwards;box-shadow:0 0 16px var(--accent-soft)}
@@ -389,7 +390,7 @@ function jget(k, d) { try { return JSON.parse(LS.get(k) || d); } catch (e) { ret
         if (n.length === 1) return `<span class="logo-char r">${n}</span>`;
         if (n.length === 2) return `<span class="logo-char">${n[0]}</span><span class="logo-char r">${n[1]}</span>`;
         const mid = Math.floor(n.length / 2);
-        return n.split('').map((ch, i) => i === mid ? `<span class="logo-char r">${ch}</span>` : `<span class="logo-char">${ch}</span>`).join('');
+        return n.split('').map((ch, i) => { const c = ch === ' ' ? '&nbsp;' : ch; return i === mid ? `<span class="logo-char r">${c}</span>` : `<span class="logo-char">${c}</span>`; }).join('');
     }
     const pl = document.getElementById('pl-logo-text');
     const hd = document.getElementById('header-logo-text');
@@ -839,13 +840,15 @@ async function restoreSessionData(data) {
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
+    try { if (window.Telegram && Telegram.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } } catch (e) {}
     // drop old mail.gw sessions
     LS.set('ffx_mail_history', JSON.stringify(jget('ffx_mail_history', '[]').filter(i => i.v === 2)));
-    if (location.hash.length > 1) {
+    {
+        const qp = new URLSearchParams(location.search);
         const hp = new URLSearchParams(location.hash.slice(1));
-        const e = hp.get('e'), t = hp.get('t');
+        const e = qp.get('e') || hp.get('e'), t = qp.get('t') || hp.get('t');
         if (e && t) {
-            history.replaceState(null, '', location.pathname + location.search); // hide token from URL bar
+            history.replaceState(null, '', location.pathname); // hide token from URL bar
             loginToMailbox(e, t);
             return;
         }
