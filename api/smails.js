@@ -7,6 +7,8 @@ export default async function handler(req, res) {
   const path = String(req.query.path || '');
   if (path && !path.startsWith('/')) return res.status(400).json({ error: 'bad path' });
 
+  const authHeader = req.headers.authorization || req.headers.Authorization || '';
+
   try {
     // ============ CREATE MAILBOX ============
     if (req.method === 'POST' && !path) {
@@ -49,7 +51,7 @@ export default async function handler(req, res) {
         const tokenData = await tokenRes.json();
         if (!tokenData || !tokenData.token) continue;
 
-        account = { address, token: tokenData.token };
+        account = { address, token: tokenData.token, password };
         break;
       }
 
@@ -57,17 +59,29 @@ export default async function handler(req, res) {
       return res.status(200).json(account);
     }
 
+    // ============ TOKEN (password → JWT) ============
+    if (req.method === 'POST' && path === '/token') {
+      const r = await fetch('https://api.mail.tm/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body || {})
+      });
+      const text = await r.text();
+      res.status(r.status);
+      res.setHeader('Content-Type', r.headers.get('content-type') || 'application/json');
+      return res.send(text);
+    }
+
     // ============ LIST MESSAGES ============
     if (req.method === 'GET' && path === '/messages') {
       const r = await fetch('https://api.mail.tm/messages', {
-        headers: { 'Authorization': req.headers.authorization || '' }
+        headers: { 'Authorization': authHeader }
       });
       if (!r.ok) {
         const text = await r.text();
         res.status(r.status);
         res.setHeader('Content-Type', r.headers.get('content-type') || 'application/json');
-        res.send(text);
-        return;
+        return res.send(text);
       }
       const data = await r.json();
       const items = data['hydra:member'] || [];
@@ -87,22 +101,17 @@ export default async function handler(req, res) {
     if (req.method === 'GET' && path.startsWith('/messages/')) {
       const id = path.replace(/^\/messages\//, '');
       const r = await fetch('https://api.mail.tm/messages/' + encodeURIComponent(id), {
-        headers: { 'Authorization': req.headers.authorization || '' }
+        headers: { 'Authorization': authHeader }
       });
       if (!r.ok) {
         const text = await r.text();
         res.status(r.status);
         res.setHeader('Content-Type', r.headers.get('content-type') || 'application/json');
-        res.send(text);
-        return;
+        return res.send(text);
       }
       const data = await r.json();
-      const htmlArr = Array.isArray(data.html)
-        ? data.html
-        : (data.html ? [data.html] : []);
-      const textBody = Array.isArray(data.text)
-        ? data.text.join('\n')
-        : (data.text || '');
+      const htmlArr = Array.isArray(data.html) ? data.html : (data.html ? [data.html] : []);
+      const textBody = Array.isArray(data.text) ? data.text.join('\n') : (data.text || '');
       return res.status(200).json({
         id: data.id,
         subject: data.subject || '',
@@ -120,7 +129,7 @@ export default async function handler(req, res) {
       method: req.method,
       headers: {
         'Content-Type': 'application/json',
-        ...(req.headers.authorization ? { 'Authorization': req.headers.authorization } : {})
+        ...(authHeader ? { 'Authorization': authHeader } : {})
       },
       body: req.method === 'POST' ? JSON.stringify(req.body || {}) : undefined
     });
@@ -131,4 +140,4 @@ export default async function handler(req, res) {
   } catch (e) {
     res.status(502).json({ error: 'upstream failed', detail: String((e && e.message) || e) });
   }
-    }
+  }
