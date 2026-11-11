@@ -777,13 +777,13 @@ async function generateEmail(customPrefix = null) {
             toastMsg('Custom name not supported by this API', true);
         saveSession(currentAccount, currentSidToken);
         checkMessages();
-        checkInterval = setInterval(checkMessages, 7000);
+        checkInterval = setInterval(checkMessages, 15000);
     } catch (e) {
         loader.style.display = 'none';
         document.getElementById('error-msg').innerText = e.message || 'Error generating email.';
         errorBox.style.display = 'flex';
         emailInput.value = currentAccount || '';
-        if (currentAccount && currentSidToken) checkInterval = setInterval(checkMessages, 7000);
+        if (currentAccount && currentSidToken) checkInterval = setInterval(checkMessages, 15000);
     }
     genBtn.disabled = false;
     isGenerating = false;
@@ -958,7 +958,7 @@ async function loginToMailbox(address, token) {
         toastMsg(softFail ? 'Connecting to inbox... retrying' + dbgTxt() : 'Mailbox opened!', softFail);
         saveSession(address, token);
         checkMessages();
-        checkInterval = setInterval(checkMessages, 7000);
+        checkInterval = setInterval(checkMessages, 15000);
     } catch (e) {
         genBtn.disabled = false;
         toastMsg(e.message, true);
