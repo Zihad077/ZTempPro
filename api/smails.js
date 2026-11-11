@@ -153,6 +153,12 @@ module.exports = async function handler(req, res) {
         try {
           const r = await f(targets[k], k === 'tempmail_lol' ? jsonOpt('POST', {}) : {}, 5000);
           out[k] = r.status;
+          if (k === 'guerrilla' && r.ok) {
+            const d = await r.json();
+            out.guerrilla_email = d && d.email_addr ? 'yes' : 'no';
+            out.guerrilla_token = d && d.sid_token ? 'yes' : 'no';
+            if (!(d && d.email_addr && d.sid_token)) out.guerrilla_keys = Object.keys(d || {}).join(',');
+          }
         } catch (e) { out[k] = 'fail'; }
       }));
       return res.status(200).json(out);
