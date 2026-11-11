@@ -587,12 +587,55 @@ async function rawFetch(url, opt = {}, ms = 12000) {
 
 // ── Direct mode: call mail.tm / mail.gw from the browser (server IPs get blocked with 403) ──
 const DIRECT = ['https://api.mail.tm', 'https://api.mail.gw'];
+const LOL = 'https://api.tempmail.lol/v2';
+window._dbg = [];
+const dbgTxt = () => window._dbg.length ? ' (' + window._dbg.join(', ') + ')' : '';
+async function dfetch(url, opt, ms) {
+    const tag = url.replace(/^https:\/\/(api\.)?/, '').split('/')[0];
+    try {
+        const r = await rawFetch(url, opt, ms);
+        if (!r.ok) window._dbg.push(tag + ':' + r.status);
+        return r;
+    } catch (e) { window._dbg.push(tag + ':' + e.message); throw e; }
+}
 const rnd = n => Math.random().toString(36).substring(2, 2 + n);
 const jres = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
 const jopt = (body) => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 
+
+// ── Backup provider: tempmail.lol (token does not start with "eyJ") ──
+const isLolToken = t => !String(t).startsWith('eyJ');
+const bearer = a => String(a || '').replace(/^Bearer\s+/i, '');
+async function lolCreate(prefix) {
+    const body = prefix ? { prefix } : {};
+    const r = await dfetch(LOL + '/inbox/create', jopt(body), 12000);
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d && d.address && d.token ? { address: d.address, token: d.token, password: '' } : null;
+}
+async function lolInbox(token) {
+    const r = await dfetch(LOL + '/inbox?token=' + encodeURIComponent(token), {}, 12000);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (d.expired) return 'expired';
+    return d.emails || [];
+}
+const lolFrom = f => { const m = String(f || '').match(/^(.*?)\s*<([^>]+)>\s*$/); return m ? { name: m[1].replace(/"/g, ''), addr: m[2] } : { name: '', addr: String(f || '') }; };
+async function lolDirect(path, auth) {
+    const emails = await lolInbox(bearer(auth));
+    if (emails === 'expired') return jres({ error: 'expired' }, 401);
+    if (!emails) return null;
+    if (path === '/messages') {
+        return jres(emails.map(m => { const f = lolFrom(m.from); return { id: String(m.date), subject: m.subject || '', from_addr: f.addr, from_name: f.name, created_at: new Date(m.date).toISOString(), intro: (m.body || '').slice(0, 100), seen: false }; }));
+    }
+    const id = decodeURIComponent(path.replace('/messages/', ''));
+    const m = emails.find(x => String(x.date) === id);
+    if (!m) return jres({ error: 'not found' }, 404);
+    const f = lolFrom(m.from);
+    return jres({ id, subject: m.subject || '', from_addr: f.addr, from_name: f.name, created_at: new Date(m.date).toISOString(), text: m.body || '', html: m.html ? [m.html] : [], has_html: !!m.html });
+}
 async function directCreate(base, prefix) {
-    const dr = await rawFetch(base + '/domains', {}, 9000);
+    const dr = await dfetch(base + '/domains', {}, 9000);
     if (!dr.ok) return null;
     const dd = await dr.json();
     const list = (Array.isArray(dd) ? dd : dd['hydra:member'] || []).filter(d => d && d.domain && d.isActive !== false && d.isPrivate !== true);
@@ -602,11 +645,11 @@ async function directCreate(base, prefix) {
         user = user.toLowerCase().replace(/[^a-z0-9]/g, '') || 'u' + rnd(10);
         const address = user + '@' + list[i % list.length].domain;
         const password = rnd(8) + 'Aa1!' + rnd(4);
-        const ar = await rawFetch(base + '/accounts', jopt({ address, password }), 9000);
+        const ar = await dfetch(base + '/accounts', jopt({ address, password }), 9000);
         if (ar.status === 429) { await sleep(1200); continue; }
         if (!ar.ok) continue;
-        let tr = await rawFetch(base + '/token', jopt({ address, password }), 9000);
-        if (tr.status === 429) { await sleep(1200); tr = await rawFetch(base + '/token', jopt({ address, password }), 9000); }
+        let tr = await dfetch(base + '/token', jopt({ address, password }), 9000);
+        if (tr.status === 429) { await sleep(1200); tr = await dfetch(base + '/token', jopt({ address, password }), 9000); }
         if (!tr.ok) continue;
         const td = await tr.json();
         if (td && td.token) return { address, token: td.token, password };
@@ -618,7 +661,7 @@ async function directGet(path, auth) {
     let saw401 = false;
     for (const base of DIRECT) {
         try {
-            const r = await rawFetch(base + path, { headers: { 'Authorization': auth } }, 9000);
+            const r = await dfetch(base + path, { headers: { 'Authorization': auth } }, 9000);
             if (r.ok) return r;
             if (r.status === 401) saw401 = true;
         } catch (e) { /* next */ }
@@ -633,9 +676,11 @@ async function direct(path, method, opt) {
         for (const base of DIRECT) {
             try { const acc = await directCreate(base, prefix); if (acc) return jres(acc); } catch (e) { /* next */ }
         }
+        try { const acc = await lolCreate(prefix); if (acc) return jres(acc); } catch (e) {}
         return null;
     }
     const auth = (opt.headers && (opt.headers.Authorization || opt.headers.authorization)) || '';
+    if (method === 'GET' && isLolToken(bearer(auth)) && (path === '/messages' || path.startsWith('/messages/'))) return lolDirect(path, auth);
     if (method === 'GET' && path === '/messages') {
         const r = await directGet('/messages', auth);
         if (!r || !r.ok) return r;
@@ -665,6 +710,7 @@ async function direct(path, method, opt) {
 
 async function tfetch(url, opt = {}, ms = 12000) {
     if (url.startsWith(PROXY)) {
+        window._dbg = [];
         const path = new URL(url).searchParams.get('path') || '';
         const method = (opt.method || 'GET').toUpperCase();
         try { const r = await direct(path, method, opt); if (r) return r; } catch (e) { /* use proxy */ }
@@ -709,7 +755,7 @@ async function generateEmail(customPrefix = null) {
             await sleep(1500);
         }
         if (!res) throw lastErr || new Error('Network error');
-        if (!res.ok) throw new Error('Create failed ' + res.status);
+        if (!res.ok) throw new Error('Create failed ' + res.status + dbgTxt());
         const data = await res.json();
         if (!data || !data.address || !data.token) throw new Error('Bad response from server');
         currentAccount = data.address;
@@ -892,7 +938,7 @@ async function loginToMailbox(address, token) {
             if (res.ok || res.status === 401) break;
             await sleep(1200);
         }
-        if (!res.ok) throw new Error(res.status === 401 ? 'Link expired or invalid' : 'Mailbox error ' + res.status);
+        if (!res.ok) throw new Error(res.status === 401 ? 'Link expired or invalid' : 'Mailbox error ' + res.status + dbgTxt());
         currentAccount = address;
         currentSidToken = token;
         emailInput.value = address;
@@ -950,7 +996,11 @@ window.addEventListener('DOMContentLoaded', () => {
     {
         const qp = new URLSearchParams(location.search);
         const hp = new URLSearchParams(location.hash.slice(1));
-        const e = qp.get('e') || hp.get('e'), t = qp.get('t') || hp.get('t');
+        let e = qp.get('e') || hp.get('e');
+        const t = qp.get('t') || hp.get('t');
+        if (t && !e) {
+            try { e = JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).username || ''; } catch (x) {}
+        }
         if (e && t) {
             history.replaceState(null, '', location.pathname); // hide token from URL bar
             loginToMailbox(e, t);
