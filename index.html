@@ -606,7 +606,7 @@ const jopt = (body) => ({ method: 'POST', headers: { 'Content-Type': 'applicatio
 
 
 // ── Backup provider: tempmail.lol (token does not start with "eyJ") ──
-const isLolToken = t => !String(t).startsWith('eyJ');
+const isLolToken = t => !String(t).startsWith('eyJ') && !String(t).startsWith('gm_');
 const bearer = a => String(a || '').replace(/^Bearer\s+/i, '');
 async function lolCreate(prefix) {
     const body = prefix ? { prefix } : {};
@@ -678,7 +678,6 @@ async function direct(path, method, opt) {
         for (const base of DIRECT) {
             try { const acc = await directCreate(base, prefix); if (acc) return jres(acc); } catch (e) { /* next */ }
         }
-        try { const acc = await lolCreate(prefix); if (acc) return jres(acc); } catch (e) {}
         return null;
     }
     const auth = (opt.headers && (opt.headers.Authorization || opt.headers.authorization)) || '';
