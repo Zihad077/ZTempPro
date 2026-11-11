@@ -3,7 +3,7 @@ const PROVIDERS = ['https://api.mail.tm', 'https://api.mail.gw'];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
-async function f(url, opt = {}, ms = 9000, notes) {
+async function f(url, opt = {}, ms = 4000, notes) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), ms);
   const tag = url.replace(/^https:\/\/api\./, '').split('/')[0];
@@ -28,7 +28,7 @@ const jsonOpt = (method, body, auth) => ({
 const rnd = n => Math.random().toString(36).substring(2, 2 + n);
 
 async function createOn(base, customPrefix, notes) {
-  const dr = await f(base + '/domains', {}, 9000, notes);
+  const dr = await f(base + '/domains', {}, 4000, notes);
   if (!dr.ok) return null;
   const dd = await dr.json();
   const list = (Array.isArray(dd) ? dd : dd['hydra:member'] || [])
@@ -42,17 +42,37 @@ async function createOn(base, customPrefix, notes) {
     const address = username + '@' + domain;
     const password = rnd(8) + 'Aa1!' + rnd(4);
 
-    const ar = await f(base + '/accounts', jsonOpt('POST', { address, password }), 9000, notes);
+    const ar = await f(base + '/accounts', jsonOpt('POST', { address, password }), 4000, notes);
     if (ar.status === 429) { await sleep(1200); continue; }
     if (!ar.ok) continue;
 
-    let tr = await f(base + '/token', jsonOpt('POST', { address, password }), 9000, notes);
+    let tr = await f(base + '/token', jsonOpt('POST', { address, password }), 4000, notes);
     if (tr.status === 429) { await sleep(1200); tr = await f(base + '/token', jsonOpt('POST', { address, password })); }
     if (!tr.ok) continue;
     const td = await tr.json();
     if (td && td.token) return { address, token: td.token, password };
   }
   return null;
+}
+
+
+// ---- Backup provider: tempmail.lol (token does not start with "eyJ") ----
+const LOL = 'https://api.tempmail.lol/v2';
+const isLol = t => !String(t).startsWith('eyJ');
+const bearer = a => String(a || '').replace(/^Bearer\s+/i, '');
+const lolFrom = x => { const m = String(x || '').match(/^(.*?)\s*<([^>]+)>\s*$/); return m ? { name: m[1].replace(/"/g, ''), addr: m[2] } : { name: '', addr: String(x || '') }; };
+
+async function lolCreate(notes) {
+  const r = await f(LOL + '/inbox/create', jsonOpt('POST', {}), 6000, notes);
+  if (!r.ok) return null;
+  const d = await r.json();
+  return d && d.address && d.token ? { address: d.address, token: d.token, password: '' } : null;
+}
+async function lolEmails(token, notes) {
+  const r = await f(LOL + '/inbox?token=' + encodeURIComponent(token), {}, 6000, notes);
+  if (!r.ok) return null;
+  const d = await r.json();
+  return d.expired ? 'expired' : d.emails || [];
 }
 
 // Try each provider until one accepts the token (tokens belong to one provider).
@@ -99,6 +119,7 @@ module.exports = async function handler(req, res) {
           if (acc) return res.status(200).json(acc);
         } catch (e) { /* try next provider */ }
       }
+      try { const acc = await lolCreate(notes); if (acc) return res.status(200).json(acc); } catch (e) { /* none worked */ }
       return res.status(502).json({ error: 'mailbox creation failed', detail: notes.join(', ') });
     }
 
@@ -107,6 +128,21 @@ module.exports = async function handler(req, res) {
       const r = await upstream('/token', 'POST', body);
       if (!r) return res.status(502).json({ error: 'upstream failed' });
       return pass(res, r);
+    }
+
+    // tempmail.lol tokens
+    if (req.method === 'GET' && isLol(bearer(auth)) && (path === '/messages' || path.startsWith('/messages/'))) {
+      const emails = await lolEmails(bearer(auth));
+      if (emails === 'expired') return res.status(401).json({ error: 'expired' });
+      if (!emails) return res.status(502).json({ error: 'upstream failed' });
+      if (path === '/messages') {
+        return res.status(200).json(emails.map(m => { const x = lolFrom(m.from); return { id: String(m.date), subject: m.subject || '', from_addr: x.addr, from_name: x.name, created_at: new Date(m.date).toISOString(), intro: (m.body || '').slice(0, 100), seen: false }; }));
+      }
+      const id = decodeURIComponent(path.replace('/messages/', ''));
+      const m = emails.find(e => String(e.date) === id);
+      if (!m) return res.status(404).json({ error: 'not found' });
+      const x = lolFrom(m.from);
+      return res.status(200).json({ id, subject: m.subject || '', from_addr: x.addr, from_name: x.name, created_at: new Date(m.date).toISOString(), text: m.body || '', html: m.html ? [m.html] : [], has_html: !!m.html });
     }
 
     // LIST MESSAGES
