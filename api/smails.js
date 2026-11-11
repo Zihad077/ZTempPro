@@ -70,6 +70,7 @@ async function lolCreate(notes) {
 }
 async function lolEmails(token, notes) {
   const r = await f(LOL + '/inbox?token=' + encodeURIComponent(token), {}, 6000, notes);
+  if (r.status === 400 || r.status === 404) return 'expired';
   if (!r.ok) return null;
   const d = await r.json();
   return d.expired ? 'expired' : d.emails || [];
@@ -132,9 +133,11 @@ module.exports = async function handler(req, res) {
 
     // tempmail.lol tokens
     if (req.method === 'GET' && isLol(bearer(auth)) && (path === '/messages' || path.startsWith('/messages/'))) {
-      const emails = await lolEmails(bearer(auth));
+      const notes = [];
+      let emails = null;
+      try { emails = await lolEmails(bearer(auth), notes); } catch (e) { /* noted */ }
       if (emails === 'expired') return res.status(401).json({ error: 'expired' });
-      if (!emails) return res.status(502).json({ error: 'upstream failed' });
+      if (!emails) return res.status(502).json({ error: 'upstream failed', detail: notes.join(', ') });
       if (path === '/messages') {
         return res.status(200).json(emails.map(m => { const x = lolFrom(m.from); return { id: String(m.date), subject: m.subject || '', from_addr: x.addr, from_name: x.name, created_at: new Date(m.date).toISOString(), intro: (m.body || '').slice(0, 100), seen: false }; }));
       }
