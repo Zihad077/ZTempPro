@@ -584,13 +584,13 @@ function copyOTP() {
 // ── API (smails.dev — same as the Telegram bot) ──
 // Put your Vercel proxy URL here, e.g. 'https://ztemppro.vercel.app/api/smails'
 const PROXY = 'https://ztemppro.vercel.app/api/smails';
-const U = path => PROXY + '?path=' + encodeURIComponent(path);
+const U = path => PROXY + '?path=' + encodeURIComponent(path) + '&_=' + Date.now();
 const AUTH = t => ({ 'Authorization': 'Bearer ' + t });
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function rawFetch(url, opt = {}, ms = 12000) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), ms);
-    try { return await fetch(url, { ...opt, signal: ctrl.signal }); }
+    try { return await fetch(url, { cache: 'no-store', ...opt, signal: ctrl.signal }); }
     catch (e) { throw new Error(e.name === 'AbortError' ? 'Network timeout' : 'Network/CORS error'); }
     finally { clearTimeout(t); }
 }
@@ -833,6 +833,7 @@ async function checkMessages() {
         const messages = asList(await res.json());
         const listEl = document.getElementById('email-list');
         document.getElementById('inbox-count').textContent = messages.length;
+        setStatus('Auto-refresh every 5s · ' + messages.length + ' mail(s) · last check ' + new Date().toLocaleTimeString(), false);
         if (!messages.length) {
             listEl.innerHTML = `<div class="email-empty"><div class="wait-loader"></div>Waiting for incoming emails...</div>`;
             return;
