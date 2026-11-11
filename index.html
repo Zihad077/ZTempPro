@@ -717,7 +717,12 @@ async function tfetch(url, opt = {}, ms = 12000) {
         const method = (opt.method || 'GET').toUpperCase();
         try { const r = await direct(path, method, opt); if (r) return r; } catch (e) { /* use proxy */ }
     }
-    return rawFetch(url, opt, ms);
+    const r = await rawFetch(url, opt, ms);
+    if (!r.ok && url.startsWith(PROXY)) {
+        window._dbg.push('proxy:' + r.status);
+        try { const j = await r.clone().json(); if (j && j.detail) window._dbg.push(j.detail); } catch (x) {}
+    }
+    return r;
 }
 const asList = d => Array.isArray(d) ? d : ((d && (d.messages || d.data)) || []);
 
