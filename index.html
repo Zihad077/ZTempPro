@@ -755,7 +755,10 @@ async function generateEmail(customPrefix = null) {
             await sleep(1500);
         }
         if (!res) throw lastErr || new Error('Network error');
-        if (!res.ok) throw new Error('Create failed ' + res.status + dbgTxt());
+        if (!res.ok) {
+            try { const j = await res.json(); if (j && j.detail) window._dbg.push('server ' + j.detail); } catch (x) {}
+            throw new Error('Create failed ' + res.status + dbgTxt());
+        }
         const data = await res.json();
         if (!data || !data.address || !data.token) throw new Error('Bad response from server');
         currentAccount = data.address;
