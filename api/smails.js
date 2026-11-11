@@ -140,6 +140,24 @@ module.exports = async function handler(req, res) {
   body = body || {};
 
   try {
+    // HEALTH CHECK: open /api/smails?path=/health in a browser
+    if (req.method === 'GET' && path === '/health') {
+      const targets = {
+        mail_tm: 'https://api.mail.tm/domains',
+        mail_gw: 'https://api.mail.gw/domains',
+        guerrilla: GM + '?f=get_email_address&lang=en&ip=127.0.0.1&agent=ztemp',
+        tempmail_lol: LOL + '/inbox/create'
+      };
+      const out = { version: 'v5-guerrilla' };
+      await Promise.all(Object.keys(targets).map(async k => {
+        try {
+          const r = await f(targets[k], k === 'tempmail_lol' ? jsonOpt('POST', {}) : {}, 5000);
+          out[k] = r.status;
+        } catch (e) { out[k] = 'fail'; }
+      }));
+      return res.status(200).json(out);
+    }
+
     // CREATE MAILBOX
     if (req.method === 'POST' && !path) {
       const prefix = body.username ? String(body.username) : null;
