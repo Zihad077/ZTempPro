@@ -612,8 +612,16 @@ async function generateEmail(customPrefix = null) {
             opt.headers = { 'Content-Type': 'application/json' };
             opt.body = JSON.stringify({ username: p, name: p, prefix: p });
         }
-        let res = await tfetch(U(''), opt);
-        if (res.status === 429) { await sleep(2500); res = await tfetch(U(''), opt); }
+        let res = null, lastErr = null;
+        for (let i = 0; i < 3; i++) {
+            try {
+                res = await tfetch(U(''), opt, 25000);
+                if (res.ok) break;
+                if (res.status !== 429 && res.status < 500) break;
+            } catch (err) { lastErr = err; res = null; }
+            await sleep(1500);
+        }
+        if (!res) throw lastErr || new Error('Network error');
         if (!res.ok) throw new Error('Create failed ' + res.status);
         const data = await res.json();
         if (!data || !data.address || !data.token) throw new Error('Bad response from server');
@@ -787,8 +795,17 @@ async function loginToMailbox(address, token) {
     genBtn.disabled = true;
     emailInput.value = 'Connecting...';
     try {
-        const res = await tfetch(U('/messages'), { headers: AUTH(token) });
-        if (!res.ok) throw new Error('Link expired or invalid');
+        address = String(address).trim();
+        token = String(token).trim();
+        if (token.includes('%')) { try { token = decodeURIComponent(token); } catch (x) {} }
+        if (address.includes('%')) { try { address = decodeURIComponent(address); } catch (x) {} }
+        let res;
+        for (let i = 0; i < 3; i++) {
+            res = await tfetch(U('/messages'), { headers: AUTH(token) });
+            if (res.ok || res.status === 401) break;
+            await sleep(1200);
+        }
+        if (!res.ok) throw new Error(res.status === 401 ? 'Link expired or invalid' : 'Mailbox error ' + res.status);
         currentAccount = address;
         currentSidToken = token;
         emailInput.value = address;
