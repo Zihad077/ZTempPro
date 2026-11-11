@@ -58,7 +58,7 @@ async function createOn(base, customPrefix, notes) {
 
 // ---- Backup provider: tempmail.lol (token does not start with "eyJ") ----
 const LOL = 'https://api.tempmail.lol/v2';
-const isLol = t => !String(t).startsWith('eyJ');
+const isLol = t => !String(t).startsWith('eyJ') && !String(t).startsWith('gm_');
 const bearer = a => String(a || '').replace(/^Bearer\s+/i, '');
 const lolFrom = x => { const m = String(x || '').match(/^(.*?)\s*<([^>]+)>\s*$/); return m ? { name: m[1].replace(/"/g, ''), addr: m[2] } : { name: '', addr: String(x || '') }; };
 
@@ -84,6 +84,26 @@ async function lolEmails(token, notes) {
   if (d.expired) return 'expired';
   LOL_CACHE.set(token, { t: Date.now(), emails: d.emails || [] });
   return d.emails || [];
+}
+
+
+// ---- Provider: Guerrilla Mail (token starts with "gm_") ----
+const GM = 'https://api.guerrillamail.com/ajax.php';
+const sidOf = t => bearer(t).replace(/^gm_/, '');
+const stripTags = h => String(h || '').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n').trim();
+
+async function gmCreate(notes) {
+  const r = await f(GM + '?f=get_email_address&lang=en&ip=127.0.0.1&agent=ztemp', {}, 6000, notes);
+  if (!r.ok) return null;
+  const d = await r.json();
+  return d && d.email_addr && d.sid_token ? { address: d.email_addr, token: 'gm_' + d.sid_token, password: '' } : null;
+}
+async function gmList(token, notes) {
+  const r = await f(GM + '?f=check_email&seq=0&sid_token=' + encodeURIComponent(sidOf(token)), {}, 6000, notes);
+  if (!r.ok) return null;
+  const d = await r.json();
+  if (!d || !Array.isArray(d.list)) return null;
+  return d.list.filter(m => m.mail_from !== 'no-reply@guerrillamail.com').sort((a, b) => Number(b.mail_timestamp) - Number(a.mail_timestamp));
 }
 
 // Try each provider until one accepts the token (tokens belong to one provider).
@@ -130,6 +150,7 @@ module.exports = async function handler(req, res) {
           if (acc) return res.status(200).json(acc);
         } catch (e) { /* try next provider */ }
       }
+      try { const acc = await gmCreate(notes); if (acc) return res.status(200).json(acc); } catch (e) { /* next */ }
       try { const acc = await lolCreate(notes); if (acc) return res.status(200).json(acc); } catch (e) { /* none worked */ }
       return res.status(502).json({ error: 'mailbox creation failed', detail: notes.join(', ') });
     }
@@ -139,6 +160,27 @@ module.exports = async function handler(req, res) {
       const r = await upstream('/token', 'POST', body);
       if (!r) return res.status(502).json({ error: 'upstream failed' });
       return pass(res, r);
+    }
+
+    // Guerrilla Mail tokens
+    if (req.method === 'GET' && bearer(auth).startsWith('gm_') && (path === '/messages' || path.startsWith('/messages/'))) {
+      const notes = [];
+      if (path === '/messages') {
+        let list = null;
+        try { list = await gmList(auth, notes); } catch (e) { /* noted */ }
+        if (!list) return res.status(502).json({ error: 'upstream failed', detail: notes.join(', ') || 'gm: no list' });
+        return res.status(200).json(list.map(m => { const x = lolFrom(m.mail_from); return { id: String(m.mail_id), subject: m.mail_subject || '', from_addr: x.addr, from_name: x.name, created_at: new Date(Number(m.mail_timestamp) * 1000).toISOString(), intro: m.mail_excerpt || '', seen: String(m.mail_read) === '1' }; }));
+      }
+      const id = decodeURIComponent(path.replace('/messages/', ''));
+      let d = null;
+      try {
+        const r = await f(GM + '?f=fetch_email&email_id=' + encodeURIComponent(id) + '&sid_token=' + encodeURIComponent(sidOf(auth)), {}, 6000, notes);
+        if (r.ok) d = await r.json();
+      } catch (e) { /* noted */ }
+      if (!d || !d.mail_id) return res.status(502).json({ error: 'upstream failed', detail: notes.join(', ') || 'gm: no mail' });
+      const x = lolFrom(d.mail_from);
+      const html = d.mail_body ? [d.mail_body] : [];
+      return res.status(200).json({ id, subject: d.mail_subject || '', from_addr: x.addr, from_name: x.name, created_at: new Date(Number(d.mail_timestamp) * 1000).toISOString(), text: stripTags(d.mail_body), html, has_html: html.length > 0 });
     }
 
     // tempmail.lol tokens
