@@ -2,11 +2,23 @@
 const PROVIDERS = ['https://api.mail.tm', 'https://api.mail.gw'];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function f(url, opt = {}, ms = 9000) {
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+async function f(url, opt = {}, ms = 9000, notes) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), ms);
-  try { return await fetch(url, { ...opt, signal: ctrl.signal }); }
-  finally { clearTimeout(t); }
+  const tag = url.replace(/^https:\/\/api\./, '').split('/')[0];
+  try {
+    const r = await fetch(url, {
+      ...opt,
+      headers: { 'User-Agent': UA, 'Accept': 'application/json', 'Accept-Language': 'en-US,en;q=0.9', ...(opt.headers || {}) },
+      signal: ctrl.signal
+    });
+    if (!r.ok && notes) notes.push(tag + ':' + r.status);
+    return r;
+  } catch (e) {
+    if (notes) notes.push(tag + ':' + (e.name === 'AbortError' ? 'timeout' : 'fail'));
+    throw e;
+  } finally { clearTimeout(t); }
 }
 const jsonOpt = (method, body, auth) => ({
   method,
@@ -15,8 +27,8 @@ const jsonOpt = (method, body, auth) => ({
 });
 const rnd = n => Math.random().toString(36).substring(2, 2 + n);
 
-async function createOn(base, customPrefix) {
-  const dr = await f(base + '/domains');
+async function createOn(base, customPrefix, notes) {
+  const dr = await f(base + '/domains', {}, 9000, notes);
   if (!dr.ok) return null;
   const dd = await dr.json();
   const list = (Array.isArray(dd) ? dd : dd['hydra:member'] || [])
@@ -30,11 +42,11 @@ async function createOn(base, customPrefix) {
     const address = username + '@' + domain;
     const password = rnd(8) + 'Aa1!' + rnd(4);
 
-    const ar = await f(base + '/accounts', jsonOpt('POST', { address, password }));
+    const ar = await f(base + '/accounts', jsonOpt('POST', { address, password }), 9000, notes);
     if (ar.status === 429) { await sleep(1200); continue; }
     if (!ar.ok) continue;
 
-    let tr = await f(base + '/token', jsonOpt('POST', { address, password }));
+    let tr = await f(base + '/token', jsonOpt('POST', { address, password }), 9000, notes);
     if (tr.status === 429) { await sleep(1200); tr = await f(base + '/token', jsonOpt('POST', { address, password })); }
     if (!tr.ok) continue;
     const td = await tr.json();
@@ -80,13 +92,14 @@ module.exports = async function handler(req, res) {
     // CREATE MAILBOX
     if (req.method === 'POST' && !path) {
       const prefix = body.username ? String(body.username) : null;
+      const notes = [];
       for (const base of PROVIDERS) {
         try {
-          const acc = await createOn(base, prefix);
+          const acc = await createOn(base, prefix, notes);
           if (acc) return res.status(200).json(acc);
         } catch (e) { /* try next provider */ }
       }
-      return res.status(502).json({ error: 'mailbox creation failed' });
+      return res.status(502).json({ error: 'mailbox creation failed', detail: notes.join(', ') });
     }
 
     // TOKEN
