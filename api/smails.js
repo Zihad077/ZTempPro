@@ -68,12 +68,22 @@ async function lolCreate(notes) {
   const d = await r.json();
   return d && d.address && d.token ? { address: d.address, token: d.token, password: '' } : null;
 }
+const LOL_CACHE = new Map(); // token -> { t, emails }
 async function lolEmails(token, notes) {
-  const r = await f(LOL + '/inbox?token=' + encodeURIComponent(token), {}, 6000, notes);
+  const hit = LOL_CACHE.get(token);
+  if (hit && Date.now() - hit.t < 8000) return hit.emails;           // fresh copy, spare the API
+  let r = await f(LOL + '/inbox?token=' + encodeURIComponent(token), {}, 6000, notes);
+  if (r.status === 429) {                                             // rate limited: wait once, retry
+    await sleep(1500);
+    r = await f(LOL + '/inbox?token=' + encodeURIComponent(token), {}, 6000, notes);
+  }
+  if (r.status === 429 && hit) return hit.emails;                     // still limited: show the last copy
   if (r.status === 400 || r.status === 404) return 'expired';
   if (!r.ok) return null;
   const d = await r.json();
-  return d.expired ? 'expired' : d.emails || [];
+  if (d.expired) return 'expired';
+  LOL_CACHE.set(token, { t: Date.now(), emails: d.emails || [] });
+  return d.emails || [];
 }
 
 // Try each provider until one accepts the token (tokens belong to one provider).
