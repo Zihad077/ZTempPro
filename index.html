@@ -586,7 +586,9 @@ async function rawFetch(url, opt = {}, ms = 12000) {
 }
 
 // ── Direct mode: call mail.tm / mail.gw from the browser (server IPs get blocked with 403) ──
-const DIRECT = ['https://api.mail.tm', 'https://api.mail.gw'];
+// Paste your Cloudflare Worker URL here (no slash at end), e.g. 'https://mailtm.yourname.workers.dev'
+const WORKER = '';
+const DIRECT = [WORKER, 'https://api.mail.tm', 'https://api.mail.gw'].filter(Boolean);
 const LOL = 'https://api.tempmail.lol/v2';
 window._dbg = [];
 const dbgTxt = () => window._dbg.length ? ' (' + window._dbg.join(', ') + ')' : '';
@@ -941,13 +943,14 @@ async function loginToMailbox(address, token) {
             if (res.ok || res.status === 401) break;
             await sleep(1200);
         }
-        if (!res.ok) throw new Error(res.status === 401 ? 'Link expired or invalid' : 'Mailbox error ' + res.status + dbgTxt());
+        if (!res.ok && res.status === 401) throw new Error('Link expired or invalid');
+        const softFail = !res.ok;
         currentAccount = address;
         currentSidToken = token;
         emailInput.value = address;
         loader.style.display = 'none';
         genBtn.disabled = false;
-        toastMsg('Mailbox opened!');
+        toastMsg(softFail ? 'Connecting to inbox... retrying' + dbgTxt() : 'Mailbox opened!', softFail);
         saveSession(address, token);
         checkMessages();
         checkInterval = setInterval(checkMessages, 7000);
