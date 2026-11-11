@@ -577,12 +577,99 @@ const PROXY = 'https://ztemppro.vercel.app/api/smails';
 const U = path => PROXY + '?path=' + encodeURIComponent(path);
 const AUTH = t => ({ 'Authorization': 'Bearer ' + t });
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-async function tfetch(url, opt = {}, ms = 12000) {
+async function rawFetch(url, opt = {}, ms = 12000) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), ms);
     try { return await fetch(url, { ...opt, signal: ctrl.signal }); }
     catch (e) { throw new Error(e.name === 'AbortError' ? 'Network timeout' : 'Network/CORS error'); }
     finally { clearTimeout(t); }
+}
+
+// ── Direct mode: call mail.tm / mail.gw from the browser (server IPs get blocked with 403) ──
+const DIRECT = ['https://api.mail.tm', 'https://api.mail.gw'];
+const rnd = n => Math.random().toString(36).substring(2, 2 + n);
+const jres = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
+const jopt = (body) => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+
+async function directCreate(base, prefix) {
+    const dr = await rawFetch(base + '/domains', {}, 9000);
+    if (!dr.ok) return null;
+    const dd = await dr.json();
+    const list = (Array.isArray(dd) ? dd : dd['hydra:member'] || []).filter(d => d && d.domain && d.isActive !== false && d.isPrivate !== true);
+    if (!list.length) return null;
+    for (let i = 0; i < 5; i++) {
+        let user = (i === 0 && prefix) ? prefix : 'u' + rnd(10);
+        user = user.toLowerCase().replace(/[^a-z0-9]/g, '') || 'u' + rnd(10);
+        const address = user + '@' + list[i % list.length].domain;
+        const password = rnd(8) + 'Aa1!' + rnd(4);
+        const ar = await rawFetch(base + '/accounts', jopt({ address, password }), 9000);
+        if (ar.status === 429) { await sleep(1200); continue; }
+        if (!ar.ok) continue;
+        let tr = await rawFetch(base + '/token', jopt({ address, password }), 9000);
+        if (tr.status === 429) { await sleep(1200); tr = await rawFetch(base + '/token', jopt({ address, password }), 9000); }
+        if (!tr.ok) continue;
+        const td = await tr.json();
+        if (td && td.token) return { address, token: td.token, password };
+    }
+    return null;
+}
+
+async function directGet(path, auth) {
+    let saw401 = false;
+    for (const base of DIRECT) {
+        try {
+            const r = await rawFetch(base + path, { headers: { 'Authorization': auth } }, 9000);
+            if (r.ok) return r;
+            if (r.status === 401) saw401 = true;
+        } catch (e) { /* next */ }
+    }
+    return saw401 ? jres({ error: 'unauthorized' }, 401) : null;
+}
+
+async function direct(path, method, opt) {
+    if (method === 'POST' && !path) {
+        let prefix = null;
+        try { prefix = opt.body ? (JSON.parse(opt.body).username || null) : null; } catch (e) {}
+        for (const base of DIRECT) {
+            try { const acc = await directCreate(base, prefix); if (acc) return jres(acc); } catch (e) { /* next */ }
+        }
+        return null;
+    }
+    const auth = (opt.headers && (opt.headers.Authorization || opt.headers.authorization)) || '';
+    if (method === 'GET' && path === '/messages') {
+        const r = await directGet('/messages', auth);
+        if (!r || !r.ok) return r;
+        const d = await r.json();
+        const items = Array.isArray(d) ? d : d['hydra:member'] || [];
+        return jres(items.map(m => ({
+            id: m.id, subject: m.subject || '',
+            from_addr: m.from ? m.from.address || '' : '', from_name: m.from ? m.from.name || '' : '',
+            created_at: m.createdAt || '', intro: m.intro || '', seen: !!m.seen
+        })));
+    }
+    if (method === 'GET' && path.startsWith('/messages/')) {
+        const r = await directGet(path, auth);
+        if (!r || !r.ok) return r;
+        const d = await r.json();
+        const h = Array.isArray(d.html) ? d.html : d.html ? [d.html] : [];
+        return jres({
+            id: d.id, subject: d.subject || '',
+            from_addr: d.from ? d.from.address || '' : '', from_name: d.from ? d.from.name || '' : '',
+            created_at: d.createdAt || '',
+            text: Array.isArray(d.text) ? d.text.join('\n') : d.text || '',
+            html: h, has_html: h.length > 0
+        });
+    }
+    return null;
+}
+
+async function tfetch(url, opt = {}, ms = 12000) {
+    if (url.startsWith(PROXY)) {
+        const path = new URL(url).searchParams.get('path') || '';
+        const method = (opt.method || 'GET').toUpperCase();
+        try { const r = await direct(path, method, opt); if (r) return r; } catch (e) { /* use proxy */ }
+    }
+    return rawFetch(url, opt, ms);
 }
 const asList = d => Array.isArray(d) ? d : ((d && (d.messages || d.data)) || []);
 
