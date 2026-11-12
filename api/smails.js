@@ -98,12 +98,24 @@ async function gmCreate(notes) {
   const d = await r.json();
   return d && d.email_addr && d.sid_token ? { address: d.email_addr, token: 'gm_' + d.sid_token, password: '' } : null;
 }
+const GM_ID = '&ip=127.0.0.1&agent=ztemp';
 async function gmList(token, notes) {
-  const r = await f(GM + '?f=check_email&seq=0&sid_token=' + encodeURIComponent(sidOf(token)), {}, 6000, notes);
-  if (!r.ok) return null;
-  const d = await r.json();
-  if (!d || !Array.isArray(d.list)) return null;
-  return d.list.filter(m => m.mail_from !== 'no-reply@guerrillamail.com').sort((a, b) => Number(b.mail_timestamp) - Number(a.mail_timestamp));
+  const sid = encodeURIComponent(sidOf(token));
+  let list = null;
+  // 1) full inbox (includes mails already read)
+  try {
+    const r1 = await f(GM + '?f=get_email_list&offset=0&sid_token=' + sid + GM_ID, {}, 6000, notes);
+    if (r1.ok) { const d1 = await r1.json(); if (d1 && Array.isArray(d1.list)) list = d1.list; }
+  } catch (e) { /* try check_email */ }
+  // 2) fallback: new mails
+  if (!list || !list.length) {
+    try {
+      const r2 = await f(GM + '?f=check_email&seq=0&sid_token=' + sid + GM_ID, {}, 6000, notes);
+      if (r2.ok) { const d2 = await r2.json(); if (d2 && Array.isArray(d2.list) && (d2.list.length || !list)) list = d2.list; }
+    } catch (e) { /* noted */ }
+  }
+  if (!list) return null;
+  return list.filter(m => m.mail_from !== 'no-reply@guerrillamail.com').sort((a, b) => Number(b.mail_timestamp) - Number(a.mail_timestamp));
 }
 
 // Try each provider until one accepts the token (tokens belong to one provider).
@@ -129,6 +141,7 @@ async function pass(res, r) {
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 'no-store, max-age=0');
+  res.setHeader('Access-Control-Expose-Headers', 'X-Debug');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(204).end();
@@ -194,6 +207,7 @@ module.exports = async function handler(req, res) {
         let list = null;
         try { list = await gmList(auth, notes); } catch (e) { /* noted */ }
         if (!list) return res.status(502).json({ error: 'upstream failed', detail: notes.join(', ') || 'gm: no list' });
+        res.setHeader('X-Debug', ('total=' + list.rawTotal + ' count=' + list.rawCount + ' from=' + list.rawFrom).replace(/[^\x20-\x7E]/g, '?').slice(0, 180));
         return res.status(200).json(list.map(m => { const x = lolFrom(m.mail_from); return { id: String(m.mail_id), subject: m.mail_subject || '', from_addr: x.addr, from_name: x.name, created_at: new Date(Number(m.mail_timestamp) * 1000).toISOString(), intro: m.mail_excerpt || '', seen: String(m.mail_read) === '1' }; }));
       }
       const id = decodeURIComponent(path.replace('/messages/', ''));
