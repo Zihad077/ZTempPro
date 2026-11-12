@@ -833,9 +833,10 @@ async function checkMessages() {
         const messages = asList(await res.json());
         const listEl = document.getElementById('email-list');
         document.getElementById('inbox-count').textContent = messages.length;
-        setStatus('Auto-refresh every 5s · ' + messages.length + ' mail(s) · last check ' + new Date().toLocaleTimeString(), false);
+        const prov = String(currentSidToken).startsWith('gm_') ? 'Guerrilla' : String(currentSidToken).startsWith('eyJ') ? 'mail.tm' : 'tempmail.lol';
+        setStatus('v6 · ' + prov + ' · ' + messages.length + ' mail(s) · auto 5s · ' + new Date().toLocaleTimeString(), false);
         if (!messages.length) {
-            listEl.innerHTML = `<div class="email-empty"><div class="wait-loader"></div>Waiting for incoming emails...</div>`;
+            listEl.innerHTML = `<div class="email-empty"><div class="wait-loader"></div>Waiting for incoming emails...<div style="margin-top:10px;font-size:0.6rem;line-height:1.5;opacity:0.8;word-break:break-all;">Checking: ${esc(currentAccount || '')}<br>Server: ${esc(prov)} · HTTP ${res.status} · ${messages.length} mail(s)</div></div>`;
             return;
         }
         listEl.innerHTML = '';
