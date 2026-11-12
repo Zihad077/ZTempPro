@@ -12,14 +12,14 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--glass:rgba(255,255,255,0.06);--glass-light:rgba(255,255,255,0.12);--glass-border:rgba(255,255,255,0.08);--glass-border-strong:rgba(255,255,255,0.16);--glass-shadow:0 8px 32px rgba(0,0,0,0.5);--glass-blur:blur(40px) saturate(1.4);--bg-base:#0a0a14;--accent-start:#6c5ce7;--accent-mid:#a855f7;--accent-end:#ec4899;--accent-solid:#7c3aed;--accent-soft:rgba(124,58,237,0.15);--txt:#f1f1f6;--txt-muted:rgba(255,255,255,0.50);--txt-dim:rgba(255,255,255,0.25);--radius-card:28px;--radius-sm:16px;--radius-full:9999px;--ease-spring:cubic-bezier(0.34,1.56,0.64,1);--ease-smooth:cubic-bezier(0.23,1,0.32,1)}
+:root{--glass:rgba(255,255,255,0.06);--glass-light:rgba(255,255,255,0.12);--glass-border:rgba(255,255,255,0.08);--glass-border-strong:rgba(255,255,255,0.16);--glass-shadow:0 8px 32px rgba(0,0,0,0.5);--glass-blur:blur(40px) saturate(1.4);--bg-base:#0a0a14;--accent-start:#10b981;--accent-mid:#10b981;--accent-end:#10b981;--accent-solid:#10b981;--accent-soft:rgba(16,185,129,0.15);--txt:#f1f1f6;--txt-muted:rgba(255,255,255,0.50);--txt-dim:rgba(255,255,255,0.25);--radius-card:28px;--radius-sm:16px;--radius-full:9999px;--ease-spring:cubic-bezier(0.34,1.56,0.64,1);--ease-smooth:cubic-bezier(0.23,1,0.32,1)}
 html{scroll-behavior:smooth}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-base);color:var(--txt);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--accent-soft);border-radius:8px}
 ::selection{background:var(--accent-solid);color:#fff}
-.bg-gradient{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 50% 40% at 20% 20%,rgba(108,92,231,0.12),transparent 60%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(236,72,153,0.08),transparent 60%),var(--bg-base);animation:bgFloat 16s ease-in-out infinite alternate}
+.bg-gradient{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 50% 40% at 20% 20%,rgba(16,185,129,0.10),transparent 60%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(16,185,129,0.06),transparent 60%),var(--bg-base);animation:bgFloat 16s ease-in-out infinite alternate}
 @keyframes bgFloat{0%{transform:scale(1) rotate(0deg)}100%{transform:scale(1.05) rotate(1.5deg)}}
 #preloader{position:fixed;inset:0;background:var(--bg-base);z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity 0.8s ease,visibility 0.8s}
 #preloader.out{opacity:0;visibility:hidden}
@@ -30,7 +30,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .pl-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));border-radius:4px;animation:plFill 2s cubic-bezier(0.4,0,0.2,1) forwards;box-shadow:0 0 16px var(--accent-soft)}
 @keyframes plFill{to{width:100%}}
 .pl-pct{font-size:0.6rem;letter-spacing:2px;color:var(--txt-muted);margin-top:12px;font-weight:400}
-.wrap{width:100%;max-width:440px;margin:0 auto;padding:12px 14px 100px;position:relative;z-index:2}
+.wrap{width:100%;max-width:440px;margin:0 auto;padding:12px 14px 40px;position:relative;z-index:2}
 .top-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 20px}
 .logo-row{display:flex;align-items:center;gap:12px}
 .logo-icon{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--accent-start),var(--accent-end));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;box-shadow:0 4px 16px var(--accent-soft)}
@@ -59,19 +59,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .hero-title .highlight{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-sub{font-size:0.9rem;color:var(--txt-muted);margin-bottom:20px;line-height:1.6;font-weight:400}
 .hero-sub .highlight{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:600}
-.input-wrap{position:relative;margin-bottom:12px}
-.url-input{width:100%;padding:16px 160px 16px 48px;border:1px solid var(--glass-border);border-radius:var(--radius-sm);background:rgba(0,0,0,0.35);color:var(--txt);font-size:0.95rem;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.3s,box-shadow 0.3s;backdrop-filter:blur(10px)}
-.url-input::placeholder{color:var(--txt-dim)}
-.url-input:focus{border-color:var(--accent-mid);box-shadow:0 0 0 3px var(--accent-soft)}
-.input-left-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--txt-muted);font-size:18px;pointer-events:none;opacity:0.5}
-.input-actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:4px;align-items:center}
-.input-action-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 10px;font-size:0.55rem;font-weight:600;color:var(--txt-muted);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.25s;display:flex;align-items:center;gap:4px;letter-spacing:0.3px;white-space:nowrap}
-.input-action-btn i{font-size:13px}
-.input-action-btn:active{transform:scale(0.92)}
-.input-action-btn.edit-btn{background:rgba(124,58,237,0.12);border-color:rgba(124,58,237,0.15);color:var(--accent-mid)}
-.btn-group{display:flex;gap:10px;margin-top:4px}
 .btn-glass{flex:1;padding:14px 16px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.35s var(--ease-spring);display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.04);backdrop-filter:blur(10px);color:var(--txt);box-shadow:0 2px 12px rgba(0,0,0,0.1)}
-.btn-glass i{font-size:16px}
 .btn-glass:active{transform:scale(0.95)}
 .btn-glass.primary{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));border-color:transparent;color:#fff;box-shadow:0 4px 20px var(--accent-soft)}
 .btn-glass.primary:active{box-shadow:0 2px 12px var(--accent-soft);transform:scale(0.95)}
@@ -103,8 +91,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .email-empty{text-align:center;padding:40px 20px;color:var(--txt-dim);font-size:0.7rem;font-weight:400;display:flex;flex-direction:column;align-items:center;gap:12px}
 .email-empty .wait-loader{width:28px;height:28px;margin:0 auto;position:relative}
 .email-empty .wait-loader::before{content:'';box-sizing:border-box;position:absolute;inset:0;border-radius:50%;border:2px solid var(--glass-border);border-top-color:var(--accent-mid);animation:spin 0.8s linear infinite}
-#email-content{display:none;margin-top:16px;border-top:1px solid var(--glass-border);padding-top:18px}
-.email-content-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .btn-back{padding:6px 16px;border-radius:var(--radius-full);background:var(--glass);border:1px solid var(--glass-border);color:var(--txt-muted);font-size:0.6rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.3s}
 .btn-back:active{transform:scale(0.94)}
 .btn-copy-otp{padding:6px 16px;border-radius:var(--radius-full);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);color:#34d399;font-size:0.6rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.3s}
@@ -112,49 +98,15 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 #email-subject{font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
 #email-sender{font-size:0.65rem;font-weight:500;color:var(--txt-muted);margin-bottom:14px}
 #email-body{font-size:0.85rem;color:var(--txt);background:transparent;padding:0;border:none;overflow:visible;width:100%;box-sizing:border-box;line-height:1.6;min-height:0}
-.email-render{display:block;width:100%;min-height:160px}
 .email-frame{display:block;width:100%;min-height:240px;border:none;border-radius:14px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.35)}
 #email-body pre{white-space:pre-wrap;font-family:'Inter',sans-serif;margin:0}
 .section-label{font-size:0.55rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--txt-dim);margin-bottom:12px}
-.faq-list{display:flex;flex-direction:column;gap:6px}
-.faq-item{background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:var(--radius-sm);overflow:hidden;transition:0.3s}
-.faq-item.open{border-color:var(--accent-soft)}
-.faq-q{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;gap:10px}
-.faq-q-txt{font-size:0.85rem;font-weight:600;color:var(--txt);line-height:1.3}
-.faq-arr{font-size:14px;color:var(--txt-dim);transition:0.3s;flex-shrink:0}
-.faq-item.open .faq-arr{transform:rotate(180deg);color:var(--accent-mid)}
-.faq-a{display:none;padding:0 16px 14px;font-size:0.82rem;color:var(--txt-muted);line-height:1.6;font-weight:400}
-.faq-item.open .faq-a{display:block}
 .s-div{height:1px;background:linear-gradient(90deg,transparent,var(--glass-border),transparent);margin:4px 0 14px;position:relative}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:var(--radius-sm);margin-bottom:18px}
-.toggle-row .label{font-size:0.85rem;font-weight:500;color:var(--txt)}
-#checkboxInput{display:none}
-.toggleSwitch{display:flex;align-items:center;justify-content:center;position:relative;width:44px;height:24px;background-color:rgba(255,255,255,0.10);border:1px solid var(--glass-border);border-radius:40px;cursor:pointer;transition-duration:.3s;flex-shrink:0}
-.toggleSwitch::after{content:"";position:absolute;height:18px;width:18px;left:2px;background:#fff;border-radius:50%;transition-duration:.3s;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
-#checkboxInput:checked+.toggleSwitch::after{transform:translateX(20px)}
-#checkboxInput:checked+.toggleSwitch{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));border-color:transparent;box-shadow:0 0 20px var(--accent-soft)}
-.bnav{position:fixed;bottom:16px;left:16px;right:16px;background:rgba(255,255,255,0.05);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:20px;display:flex;justify-content:space-around;align-items:center;padding:6px 0;z-index:200;box-shadow:0 4px 30px rgba(0,0,0,0.5);max-width:440px;margin-left:auto;margin-right:auto}
-.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 16px;transition:0.2s;border-radius:12px;background:transparent;border:none;color:var(--txt-dim);font-family:'Inter',sans-serif;min-width:60px}
-.bnav-btn:active{transform:scale(0.90)}
-.bnav-icon{font-size:20px;transition:0.2s}
-.bnav-lbl{font-size:0.45rem;font-weight:600;letter-spacing:1px;transition:0.2s;text-transform:uppercase}
-.bnav-btn.active .bnav-icon,.bnav-btn.active .bnav-lbl{color:#fff}
-.bnav-btn.active .bnav-icon{text-shadow:0 0 20px var(--accent-soft)}
-.bnav-btn.active{background:rgba(255,255,255,0.06)}
 .tab-section{display:none;animation:fadeUp 0.5s var(--ease-smooth)}
 .tab-section.active{display:block}
 @keyframes fadeUp{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
 .footer{text-align:center;font-size:0.5rem;font-weight:500;color:var(--txt-dim);margin-top:18px;padding-bottom:6px;letter-spacing:2px}
 .footer .highlight{background:linear-gradient(135deg,var(--accent-start),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.theme-btn{position:fixed;right:16px;bottom:82px;width:44px;height:44px;border-radius:14px;background:var(--glass);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;font-size:18px;z-index:500;cursor:pointer;box-shadow:var(--glass-shadow);transition:all 0.3s var(--ease-spring);color:var(--txt-muted)}
-.theme-btn:active{transform:scale(0.88)}
-.theme-panel{position:fixed;right:66px;bottom:76px;background:rgba(20,20,36,0.92);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:18px;padding:14px 10px;display:none;flex-direction:column;gap:8px;z-index:500;box-shadow:var(--glass-shadow);align-items:center}
-.theme-panel.open{display:flex;animation:fadeUp 0.3s var(--ease-spring)}
-.theme-panel::before{content:'COLOR';position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:0.35rem;font-weight:600;letter-spacing:2px;color:var(--txt-dim);background:rgba(20,20,36,0.92);padding:0 8px;border-radius:4px;border:1px solid var(--glass-border)}
-.thDot{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all 0.3s var(--ease-spring);flex-shrink:0;position:relative;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
-.thDot:active{transform:scale(0.85)}
-.thDot.on{border-color:rgba(255,255,255,0.8);box-shadow:0 0 20px currentColor}
-.th-divider{width:16px;height:1px;background:var(--glass-border);margin:2px 0}
 #musicNotif{position:fixed;top:16px;left:16px;right:16px;z-index:8000;pointer-events:none;transform:translateY(-120px) scale(0.92);opacity:0;transition:transform 0.6s var(--ease-spring),opacity 0.5s ease;will-change:transform,opacity;max-width:440px;margin:0 auto}
 #musicNotif.show{transform:translateY(0) scale(1);opacity:1;pointer-events:all}
 #musicNotif.hide{transform:translateY(-120px) scale(0.92);opacity:0;pointer-events:none;transition:transform 0.4s cubic-bezier(0.55,0,1,0.45),opacity 0.35s ease}
@@ -179,16 +131,38 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .toast.err{border-left-color:#f87171;color:#fca5a5}
 #pCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5}
 @media (max-width:420px){
-.wrap{padding:8px 10px 90px}
+.wrap{padding:8px 10px 30px}
 .hero-title{font-size:1.6rem}
 .glass-card{padding:20px 16px;border-radius:24px}
-.url-input{font-size:0.85rem;padding:14px 140px 14px 42px}
-.input-action-btn{font-size:0.5rem;padding:4px 8px}
 .btn-glass{font-size:0.7rem;padding:12px 12px}
-.bnav{padding:4px 0;bottom:12px;left:12px;right:12px}
-.bnav-btn{padding:4px 12px;min-width:50px}
 }
 @media (max-width:360px){.logo-text{font-size:1rem;letter-spacing:1px}.hero-title{font-size:1.4rem}}
+
+.addr-box{display:flex;align-items:center;gap:14px;padding:16px;margin-bottom:14px;border-radius:22px;background:linear-gradient(135deg,rgba(16,185,129,0.16),rgba(16,185,129,0.04));border:1px solid rgba(16,185,129,0.38);box-shadow:0 0 32px rgba(16,185,129,0.12) inset,0 6px 24px rgba(0,0,0,0.3)}
+.addr-icon{width:44px;height:44px;border-radius:15px;flex-shrink:0;background:rgba(16,185,129,0.20);display:flex;align-items:center;justify-content:center;color:#34d399;font-size:21px}
+.addr-body{min-width:0;flex:1}
+.addr-label{font-size:0.5rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--txt-muted);font-weight:600;margin-bottom:5px}
+#email-address{display:block;width:100%;background:none;border:none;outline:none;color:#fff;font-family:'Inter',sans-serif;font-weight:700;font-size:1rem;padding:0;text-overflow:clip;white-space:nowrap}
+#email-address::placeholder{color:var(--txt-dim)}
+.action-row{display:flex;gap:10px;align-items:center;margin-top:2px}
+.btn-big{flex:1;height:56px;border-radius:19px;border:1px solid var(--glass-border-strong);font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.3px;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all 0.3s var(--ease-spring)}
+.btn-big i{font-size:19px}
+.btn-big:active{transform:scale(0.95)}
+.btn-big:disabled{opacity:0.4;cursor:not-allowed}
+.btn-big.primary{background:linear-gradient(135deg,#10b981,#059669);border-color:transparent;box-shadow:0 8px 26px rgba(16,185,129,0.38)}
+.btn-big.secondary{background:rgba(255,255,255,0.07)}
+.btn-round{width:46px;height:46px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,0.07);border:1px solid var(--glass-border-strong);color:var(--txt-muted);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all 0.3s var(--ease-spring)}
+.btn-round:active{transform:scale(0.88)}
+#mail-modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 10px) 8px calc(env(safe-area-inset-bottom,0px) + 10px);background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#mail-modal.open{display:flex;animation:mmFade 0.25s ease}
+@keyframes mmFade{from{opacity:0}to{opacity:1}}
+@keyframes mmPop{from{transform:translateY(24px) scale(0.97);opacity:0}to{transform:none;opacity:1}}
+#email-content{display:flex;flex-direction:column;width:100%;max-width:440px;height:100%;background:rgba(15,17,28,0.98);border:1px solid var(--glass-border-strong);border-radius:26px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,0.65);animation:mmPop 0.35s var(--ease-spring)}
+.mm-bar{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--glass-border);flex-shrink:0;background:rgba(255,255,255,0.03)}
+.mm-close{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.mm-close:active{transform:scale(0.88)}
+.mm-title{flex:1;font-size:0.8rem;font-weight:700;color:var(--txt);letter-spacing:0.5px}
+.mm-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 14px 22px;-webkit-overflow-scrolling:touch}
 </style>
 </head>
 <body>
@@ -203,17 +177,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
     <div class="pl-pct" id="plPct">0%</div>
 </div>
 
-<div class="theme-btn" id="mobThemeBtn" onclick="toggleThemePanel()"><i class="ti ti-palette"></i></div>
-<div class="theme-panel" id="mobThemePanel">
-    <div class="thDot" style="background:#7c3aed;color:#7c3aed" data-c="#7c3aed" onclick="setTheme('#7c3aed',this)"></div>
-    <div class="thDot" style="background:#ec4899;color:#ec4899" data-c="#ec4899" onclick="setTheme('#ec4899',this)"></div>
-    <div class="thDot" style="background:#06b6d4;color:#06b6d4" data-c="#06b6d4" onclick="setTheme('#06b6d4',this)"></div>
-    <div class="th-divider"></div>
-    <div class="thDot" style="background:#f59e0b;color:#f59e0b" data-c="#f59e0b" onclick="setTheme('#f59e0b',this)"></div>
-    <div class="thDot" style="background:#10b981;color:#10b981" data-c="#10b981" onclick="setTheme('#10b981',this)"></div>
-    <div class="thDot" style="background:#ef4444;color:#ef4444" data-c="#ef4444" onclick="setTheme('#ef4444',this)"></div>
-</div>
-
 <div id="musicNotif">
     <div class="mn-inner" id="mnInner">
         <div class="mn-album" id="mnAlbum"><i class="ti ti-mail"></i></div>
@@ -223,22 +186,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
             <div class="mn-sub" id="mnSubText">From: sender</div>
         </div>
         <button class="mn-close" onclick="mnClose()"><i class="ti ti-x"></i></button>
-    </div>
-</div>
-
-<div class="modal-overlay" id="edit-modal">
-    <div class="modal-sheet" id="edit-modal-content">
-        <div class="modal-handle"></div>
-        <div class="modal-title">Edit Email Prefix</div>
-        <p style="color:var(--txt-muted);font-size:0.8rem;text-align:center;margin-bottom:16px;">Choose a custom name for your email</p>
-        <div style="position:relative;margin-bottom:18px;">
-            <i class="ti ti-pencil" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--txt-dim);font-size:16px;"></i>
-            <input type="text" id="custom-prefix-input" placeholder="Enter gmail name" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:12px;padding:12px 14px 12px 40px;color:#fff;font-family:'Inter',sans-serif;font-size:0.9rem;outline:none;transition:0.3s;" onfocus="this.style.borderColor='var(--accent-mid)'" onblur="this.style.borderColor='var(--glass-border)'" />
-        </div>
-        <div style="display:flex;gap:10px;">
-            <button class="btn-glass secondary" onclick="closeEditModal()" style="flex:1;">Cancel</button>
-            <button class="btn-glass primary" onclick="submitEditModal()" style="flex:1;">Generate</button>
-        </div>
     </div>
 </div>
 
@@ -278,12 +225,23 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
     </div>
 </div>
 
+<div id="mail-modal">
+    <div id="email-content">
+        <div class="mm-bar">
+            <button class="mm-close" onclick="closeEmail()" aria-label="Close"><i class="ti ti-x"></i></button>
+            <div class="mm-title">Message</div>
+            <button class="btn-copy-otp" onclick="copyOTP()"><i class="ti ti-copy"></i> Copy OTP</button>
+        </div>
+        <div class="mm-scroll">
+            <div id="email-subject"></div>
+            <div id="email-sender"></div>
+            <div id="email-body"></div>
+        </div>
+    </div>
+</div>
+
 <div id="toastBox"></div>
 
-<nav class="bnav">
-    <button class="bnav-btn active" onclick="showTab('home',this)"><i class="ti ti-home bnav-icon"></i><span class="bnav-lbl">Home</span></button>
-    <button class="bnav-btn" onclick="showTab('faq',this)"><i class="ti ti-settings bnav-icon"></i><span class="bnav-lbl">Settings</span></button>
-</nav>
 
 <div class="wrap">
     <div class="top-bar">
@@ -301,17 +259,17 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
             <div class="hero-eyebrow"><span class="pulse-dot"></span><span class="eyebrow-text">Temp Mail · Unlimited · Free</span></div>
             <div class="hero-title"><span class="highlight">Temp</span> Mail</div>
             <p class="hero-sub">Get a secure, temporary email address instantly. Perfect for <span class="highlight">protecting your privacy</span>, avoiding spam, and keeping your personal inbox clean.</p>
-            <div class="input-wrap">
-                <i class="ti ti-mail input-left-icon"></i>
-                <input class="url-input" type="text" id="email-address" readonly placeholder="Generating email..." />
-                <div class="input-actions">
-                    <button class="input-action-btn edit-btn" id="editBtn" onclick="promptCustomUsername()"><i class="ti ti-pencil"></i> Edit</button>
-                    <button class="input-action-btn copy-btn" id="copyBtn" onclick="copyEmail()"><i class="ti ti-copy"></i> Copy</button>
+            <div class="addr-box">
+                <div class="addr-icon"><i class="ti ti-mail"></i></div>
+                <div class="addr-body">
+                    <div class="addr-label">Your temporary email</div>
+                    <input type="text" id="email-address" readonly placeholder="Generating email..." />
                 </div>
             </div>
-            <div class="btn-group">
-                <button class="btn-glass primary" id="generate-btn" onclick="generateEmail()"><i class="ti ti-refresh"></i> Generate New</button>
-                <button class="btn-glass secondary" id="share-btn" onclick="shareMailbox()"><i class="ti ti-share"></i> Share</button>
+            <div class="action-row">
+                <button class="btn-big secondary" id="generate-btn" onclick="generateEmail()"><i class="ti ti-refresh"></i> Generate</button>
+                <button class="btn-big primary" id="copyBtn" onclick="copyEmail()"><i class="ti ti-copy"></i> Copy</button>
+                <button class="btn-round" id="share-btn" onclick="shareMailbox()" aria-label="Share"><i class="ti ti-share"></i></button>
             </div>
             <div class="status-box loading" id="loader" style="display:flex;">
                 <div class="spinner"></div>
@@ -333,51 +291,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
             </div>
             <div id="inbox-status" class="inbox-status"></div>
             <div id="email-list"></div>
-            <div id="email-content">
-                <div class="email-content-header">
-                    <button class="btn-back" onclick="closeEmail()"><i class="ti ti-arrow-left"></i> Back</button>
-                    <button class="btn-copy-otp" onclick="copyOTP()"><i class="ti ti-copy"></i> Copy OTP</button>
-                </div>
-                <div id="email-subject"></div>
-                <div id="email-sender"></div>
-                <div id="email-body"></div>
-            </div>
         </div>
 
-        <p class="footer">© 2026 <span class="site-name-dynamic highlight"></span> · For personal use only</p>
-    </div>
-
-    <div class="tab-section" id="tab-faq">
-        <div class="glass-card">
-            <div class="section-label">Settings</div>
-            <div class="toggle-row">
-                <span class="label">Show Loading Screen</span>
-                <div>
-                    <input type="checkbox" id="checkboxInput" onchange="togglePreloaderSetting()" />
-                    <label for="checkboxInput" class="toggleSwitch"></label>
-                </div>
-            </div>
-            <div class="section-label">FAQ</div>
-            <div class="s-div"></div>
-            <div class="faq-list">
-                <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-txt">Is <span class="site-name-dyn-text"></span> completely free?</span><i class="ti ti-chevron-down faq-arr"></i></div>
-                    <div class="faq-a">Yes! <span class="site-name-dyn-text"></span> is 100% free. No registration, no subscription, no hidden fees. Just generate an email and use it.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-txt">Is it safe for Social Media &amp; premium sites?</span><i class="ti ti-chevron-down faq-arr"></i></div>
-                    <div class="faq-a">Absolutely. Our system uses premium domains optimized to bypass strict spam filters, ensuring you can sign up anywhere securely without revealing your real identity.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-txt">Will I lose my email if I close the tab?</span><i class="ti ti-chevron-down faq-arr"></i></div>
-                    <div class="faq-a">No! Your active email and previous sessions are securely saved in your browser. You can always access and restore your past emails using the "History" feature until you manually clear them.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-txt">Is there a limit to how many emails I can receive?</span><i class="ti ti-chevron-down faq-arr"></i></div>
-                    <div class="faq-a">No limits! You can receive as many verification codes, links, and messages as you need, completely for free.</div>
-                </div>
-            </div>
-        </div>
         <p class="footer">© 2026 <span class="site-name-dynamic highlight"></span> · For personal use only</p>
     </div>
 </div>
@@ -420,20 +335,8 @@ function jget(k, d) { try { return JSON.parse(LS.get(k) || d); } catch (e) { ret
     }
 })();
 
-// ── PRELOADER ──
-function togglePreloaderSetting() {
-    const chk = document.getElementById('checkboxInput');
-    if (chk.checked) LS.del('ffx_hide_preloader');
-    else LS.set('ffx_hide_preloader', 'true');
-}
+// ── PRELOADER (always shown) ──
 (function() {
-    const chk = document.getElementById('checkboxInput');
-    if (chk) chk.checked = LS.get('ffx_hide_preloader') !== 'true';
-    if (LS.get('ffx_hide_preloader') === 'true') {
-        const pl = document.getElementById('preloader');
-        if (pl) pl.style.display = 'none';
-        return;
-    }
     let p = 0;
     const pct = document.getElementById('plPct');
     const iv = setInterval(() => {
@@ -451,7 +354,7 @@ function togglePreloaderSetting() {
     function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
     resize();
     window.addEventListener('resize', resize);
-    let accentColor = '#7c3aed';
+    let accentColor = '#10b981';
     window._updateParticleColor = function(col) { accentColor = col; };
     const pts = Array.from({ length: 35 }, () => ({
         x: Math.random() * 1400, y: Math.random() * 900,
@@ -494,45 +397,6 @@ function togglePreloaderSetting() {
     }
     draw();
 })();
-
-// ── THEME ──
-function applyTheme(c, save) {
-    const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16);
-    const root = document.documentElement;
-    root.style.setProperty('--accent-start', c);
-    root.style.setProperty('--accent-mid', c);
-    root.style.setProperty('--accent-end', c);
-    root.style.setProperty('--accent-solid', c);
-    root.style.setProperty('--accent-soft', `rgba(${r},${g},${b},0.15)`);
-    const tm = document.querySelector('meta[name="theme-color"]');
-    if (tm) tm.content = c;
-    document.querySelectorAll('.thDot').forEach(d => d.classList.toggle('on', d.getAttribute('data-c') === c));
-    if (window._updateParticleColor) window._updateParticleColor(c);
-    if (save) LS.set((document.title || 'FFX') + '_theme', c);
-}
-function setTheme(c, el) { applyTheme(c, true); toggleThemePanel(); toastMsg('Theme updated!'); }
-function toggleThemePanel() { document.getElementById('mobThemePanel').classList.toggle('open'); }
-(function() {
-    const saved = LS.get((document.title || 'FFX') + '_theme');
-    applyTheme(saved || '#7c3aed', false);
-})();
-
-// ── TABS ──
-function showTab(id, btn) {
-    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-    document.getElementById('tab-' + id).classList.add('active');
-    document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ── FAQ ──
-function toggleFaq(el) {
-    const item = el.closest('.faq-item');
-    const isOpen = item.classList.contains('open');
-    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
-    if (!isOpen) item.classList.add('open');
-}
 
 // ── TOAST ──
 function toastMsg(msg, err = false) {
@@ -808,7 +672,7 @@ function getLogo(senderEmail, senderName, subject) {
     const p = senderEmail.split('@');
     if (p.length === 2 && !p[1].includes('mail') && !p[1].includes('reply') && !p[1].includes('bounce'))
         return `https://logo.clearbit.com/${p[1]}?size=64`;
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(senderName || p[0] || 'A')}&background=7c3aed&color=fff&rounded=true&bold=true`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(senderName || p[0] || 'A')}&background=10b981&color=fff&rounded=true&bold=true`;
 }
 
 let checking = false;
@@ -830,7 +694,7 @@ async function checkMessages() {
             return;
         }
         setStatus('Auto-refresh every 5s · last check ' + new Date().toLocaleTimeString(), false);
-        const messages = asList(await res.json());
+        const messages = asList(await res.json()).filter(m => { const t = new Date(m.created_at || m.createdAt || '').getTime(); return isNaN(t) || Date.now() - t < MAIL_TTL; });
         const listEl = document.getElementById('email-list');
         document.getElementById('inbox-count').textContent = messages.length;
         const prov = String(currentSidToken).startsWith('gm_') ? 'Guerrilla' : String(currentSidToken).startsWith('eyJ') ? 'mail.tm' : 'tempmail.lol';
@@ -849,7 +713,7 @@ async function checkMessages() {
             }
             const item = document.createElement('div');
             item.className = 'email-item';
-            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(fromAddr.split('@')[0] || 'M')}&background=7c3aed&color=fff&rounded=true&bold=true`;
+            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(fromAddr.split('@')[0] || 'M')}&background=10b981&color=fff&rounded=true&bold=true`;
             item.innerHTML = `
                 <img src="${esc(getLogo(fromAddr, fromName, msg.subject))}" class="avatar" alt="">
                 <div class="body">
@@ -895,6 +759,7 @@ function renderEmailHtml(bodyEl, html) {
             if (!d || !d.body) return;
             d.body.style.zoom = '';
             const w = frame.clientWidth, sw = d.documentElement.scrollWidth;
+            if (w < 50) return;
             if (sw > w + 2) d.body.style.zoom = (w / sw).toFixed(4);
             frame.style.height = (d.documentElement.scrollHeight + 6) + 'px';
         } catch (e) {}
@@ -916,8 +781,7 @@ async function viewMessage(id) {
         const res = await tfetch(U('/messages/' + encodeURIComponent(id)), { headers: AUTH(currentSidToken) });
         if (!res.ok) throw new Error('Failed to load message');
         const msg = await res.json();
-        document.getElementById('email-list').style.display = 'none';
-        document.getElementById('email-content').style.display = 'block';
+        openMailModal();
         document.getElementById('email-subject').innerText = msg.subject || 'No Subject';
         const fromAddr = msg.from_addr || (msg.from && msg.from.address) || 'unknown';
         const d = new Date(msg.created_at || msg.createdAt || msg.received_at || '');
@@ -935,29 +799,30 @@ async function viewMessage(id) {
     loader.style.display = 'none';
 }
 
+function openMailModal() {
+    document.getElementById('mail-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const sc = document.querySelector('.mm-scroll'); if (sc) sc.scrollTop = 0;
+}
 function closeEmail() {
-    document.getElementById('email-list').style.display = 'flex';
-    document.getElementById('email-content').style.display = 'none';
+    document.getElementById('mail-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    const b = document.getElementById('email-body'); if (b) b.innerHTML = '';
 }
+document.getElementById('mail-modal').addEventListener('click', e => { if (e.target.id === 'mail-modal') closeEmail(); });
 
-// ── EDIT PREFIX ──
-function promptCustomUsername() {
-    const modal = document.getElementById('edit-modal');
-    document.getElementById('custom-prefix-input').value = '';
-    modal.style.display = 'flex';
-    requestAnimationFrame(() => modal.classList.add('open'));
-    setTimeout(() => document.getElementById('custom-prefix-input').focus(), 300);
-}
-function closeEditModal() {
-    const modal = document.getElementById('edit-modal');
-    modal.classList.remove('open');
-    setTimeout(() => { modal.style.display = 'none'; }, 400);
-}
-function submitEditModal() {
-    const name = document.getElementById('custom-prefix-input').value.trim();
-    if (name) { closeEditModal(); generateEmail(name); }
-    else toastMsg('Prefix cannot be empty!', true);
-}
+// ── EMAIL TEXT AUTO-FIT ──
+(function() {
+    const el = document.getElementById('email-address');
+    const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    function fit() {
+        const len = (desc.get.call(el) || '').length || 12;
+        const w = el.clientWidth || 240;
+        el.style.fontSize = Math.max(11, Math.min(18, w / (len * 0.6))) + 'px';
+    }
+    Object.defineProperty(el, 'value', { get() { return desc.get.call(this); }, set(v) { desc.set.call(this, v); fit(); } });
+    window.addEventListener('resize', fit);
+})();
 
 // ── SHARE ──
 function shareMailbox() {
@@ -1010,9 +875,32 @@ async function loginToMailbox(address, token) {
 }
 
 // ── SESSION ──
+// Providers keep a mail only ~1 hour (Guerrilla Mail deletes each mail 1 hour after delivery),
+// so saved mailboxes and mails vanish from this app after the same time.
+const MAIL_TTL = 60 * 60 * 1000;
+function purgeExpired() {
+    const now = Date.now();
+    const alive = i => now - (i.created || i.timestamp || 0) < MAIL_TTL;
+    const hist = jget('ffx_mail_history', '[]');
+    const kept = hist.filter(alive);
+    if (kept.length !== hist.length) LS.set('ffx_mail_history', JSON.stringify(kept));
+    const saved = jget('ffx_saved_mail', 'null');
+    if (saved && !alive(saved)) LS.del('ffx_saved_mail');
+    if (currentAccount && hist.some(i => i.address === currentAccount) && !kept.some(i => i.address === currentAccount) && !isGenerating) {
+        clearInterval(checkInterval);
+        currentSidToken = null;
+        document.getElementById('email-list').innerHTML = '';
+        closeEmail();
+        toastMsg('Mailbox expired (1 hour). Creating a new one...', true);
+        generateEmail();
+    }
+}
+setInterval(() => { try { purgeExpired(); } catch (e) {} }, 30000);
+
 function saveSession(address, token) {
     const old = jget('ffx_mail_history', '[]').find(i => i.address === address);
-    const data = { v: 2, address, token, timestamp: Date.now() };
+    const created = (old && (old.created || old.timestamp)) || Date.now();
+    const data = { v: 2, address, token, timestamp: created, created };
     if (old && old.customName) data.customName = old.customName;
     LS.set('ffx_saved_mail', JSON.stringify(data));
     let history = jget('ffx_mail_history', '[]').filter(i => i.address !== address);
@@ -1044,6 +932,7 @@ async function restoreSessionData(data) {
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
+    try { purgeExpired(); } catch (e) {}
     try { if (window.Telegram && Telegram.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } } catch (e) {}
     // drop old mail.gw sessions
     LS.set('ffx_mail_history', JSON.stringify(jget('ffx_mail_history', '[]').filter(i => i.v === 2)));
@@ -1105,6 +994,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ── HISTORY MODAL ──
 function openHistoryModal() {
+    try { purgeExpired(); } catch (e) {}
     const modal = document.getElementById('history-modal');
     const list = document.getElementById('history-list');
     const history = jget('ffx_mail_history', '[]');
@@ -1126,7 +1016,8 @@ function openHistoryModal() {
                 closeHistoryModal();
                 if (currentAccount !== item.address) restoreSessionData(item);
             };
-            const dateStr = new Date(item.timestamp).toLocaleString();
+            const left = Math.max(0, Math.ceil((MAIL_TTL - (Date.now() - (item.created || item.timestamp))) / 60000));
+            const dateStr = new Date(item.timestamp).toLocaleString() + ' · expires in ' + left + ' min';
             const custom = item.customName ? `<div style="font-size:0.7rem;font-weight:600;color:var(--accent-mid);margin-bottom:4px;">${esc(item.customName)}</div>` : '';
             div.innerHTML = `
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;">
@@ -1221,8 +1112,7 @@ function renameHistoryItem(address) {
 document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', (e) => {
         if (e.target === m) {
-            if (m.id === 'edit-modal') closeEditModal();
-            else if (m.id === 'history-modal') closeHistoryModal();
+            if (m.id === 'history-modal') closeHistoryModal();
             else if (m.id === 'custom-confirm-modal') closeConfirmModal();
             else if (m.id === 'custom-prompt-modal') closePromptModal();
         }
