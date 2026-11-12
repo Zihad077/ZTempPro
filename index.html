@@ -111,9 +111,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .btn-copy-otp:active{transform:scale(0.94)}
 #email-subject{font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
 #email-sender{font-size:0.65rem;font-weight:500;color:var(--txt-muted);margin-bottom:14px}
-#email-body{font-size:0.85rem;color:var(--txt);background:rgba(0,0,0,0.3);padding:8px;border-radius:var(--radius-sm);border:1px solid var(--glass-border);overflow:visible;width:100%;box-sizing:border-box;line-height:1.6;min-height:200px}
+#email-body{font-size:0.85rem;color:var(--txt);background:transparent;padding:0;border:none;overflow:visible;width:100%;box-sizing:border-box;line-height:1.6;min-height:0}
 .email-render{display:block;width:100%;min-height:160px}
-#email-body iframe{width:100%;min-height:280px;border:none;border-radius:10px;background:#fff}
+.email-frame{display:block;width:100%;min-height:240px;border:none;border-radius:14px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.35)}
 #email-body pre{white-space:pre-wrap;font-family:'Inter',sans-serif;margin:0}
 .section-label{font-size:0.55rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--txt-dim);margin-bottom:12px}
 .faq-list{display:flex;flex-direction:column;gap:6px}
@@ -836,7 +836,7 @@ async function checkMessages() {
         const prov = String(currentSidToken).startsWith('gm_') ? 'Guerrilla' : String(currentSidToken).startsWith('eyJ') ? 'mail.tm' : 'tempmail.lol';
         setStatus('v6 · ' + prov + ' · ' + messages.length + ' mail(s) · auto 5s · ' + new Date().toLocaleTimeString(), false);
         if (!messages.length) {
-            listEl.innerHTML = `<div class="email-empty"><div class="wait-loader"></div>Waiting for incoming emails...<div style="margin-top:10px;font-size:0.6rem;line-height:1.5;opacity:0.8;word-break:break-all;">Checking: ${esc(currentAccount || '')}<br>Server: ${esc(prov)} · HTTP ${res.status} · ${messages.length} mail(s)</div></div>`;
+            listEl.innerHTML = `<div class="email-empty"><div class="wait-loader"></div>Waiting for incoming emails...<div style="margin-top:10px;font-size:0.6rem;line-height:1.5;opacity:0.8;word-break:break-all;">Checking: ${esc(currentAccount || '')}<br>Server: ${esc(prov)} · HTTP ${res.status} · ${messages.length} mail(s)<br>Raw: ${esc(res.headers.get('x-debug') || 'n/a')}</div></div>`;
             return;
         }
         listEl.innerHTML = '';
@@ -874,18 +874,36 @@ function renderEmailHtml(bodyEl, html) {
             if (n.startsWith('on')) el.removeAttribute(a.name);
             else if ((n === 'href' || n === 'src' || n === 'xlink:href') && v.startsWith('javascript:')) el.removeAttribute(a.name);
         });
-        if (el.tagName === 'A') { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
     });
     const text = (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
-    const host = document.createElement('div');
-    host.className = 'email-render';
-    bodyEl.appendChild(host);
-    const root = host.attachShadow({ mode: 'open' });
-    root.innerHTML = '<style>:host{display:block}.m{background:#fff;color:#222;padding:15px;border-radius:10px;font-family:-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.5;overflow-x:auto;word-break:break-word}.m img{max-width:100%;height:auto}.m table{max-width:100%}.m a{color:#2563eb}</style><div class="m"></div>';
-    const m = root.querySelector('.m');
-    doc.head.querySelectorAll('style').forEach(st => m.appendChild(st.cloneNode(true)));
-    while (doc.body.firstChild) m.appendChild(doc.body.firstChild);
-    if (!text && !m.querySelector('img,table')) m.textContent = 'Empty message.';
+    if (!text && !doc.body.querySelector('img,table')) { bodyEl.textContent = 'Empty message.'; return text; }
+
+    const styles = [...doc.head.querySelectorAll('style')].map(st => st.outerHTML).join('');
+    const frame = document.createElement('iframe');
+    frame.className = 'email-frame';
+    frame.setAttribute('sandbox', 'allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+    frame.srcdoc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_blank">' +
+        '<style>html,body{margin:0;padding:0;background:#fff;color:#202124;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;overflow-wrap:anywhere;word-break:break-word}' +
+        'body{padding:16px 14px}img{max-width:100%!important;height:auto!important}table{max-width:100%}a{color:#1a73e8}pre{white-space:pre-wrap}</style>' +
+        styles + '</head><body>' + doc.body.innerHTML + '</body></html>';
+    bodyEl.appendChild(frame);
+
+    // Shrink wide emails to the phone width and grow the frame to the full email height (like Gmail)
+    const fit = () => {
+        try {
+            const d = frame.contentDocument;
+            if (!d || !d.body) return;
+            d.body.style.zoom = '';
+            const w = frame.clientWidth, sw = d.documentElement.scrollWidth;
+            if (sw > w + 2) d.body.style.zoom = (w / sw).toFixed(4);
+            frame.style.height = (d.documentElement.scrollHeight + 6) + 'px';
+        } catch (e) {}
+    };
+    frame.addEventListener('load', () => {
+        fit(); setTimeout(fit, 300); setTimeout(fit, 1200); setTimeout(fit, 3000);
+        try { frame.contentDocument.querySelectorAll('img').forEach(im => im.addEventListener('load', fit)); } catch (e) {}
+    });
+    window.addEventListener('resize', fit);
     return text;
 }
 
@@ -903,7 +921,8 @@ async function viewMessage(id) {
         document.getElementById('email-subject').innerText = msg.subject || 'No Subject';
         const fromAddr = msg.from_addr || (msg.from && msg.from.address) || 'unknown';
         const d = new Date(msg.created_at || msg.createdAt || msg.received_at || '');
-        document.getElementById('email-sender').innerText = `From: ${fromAddr}` + (isNaN(d) ? '' : ' · ' + d.toLocaleString());
+        const fromName = msg.from_name || (msg.from && msg.from.name) || '';
+        document.getElementById('email-sender').innerHTML = `<b style="color:#fff;font-size:0.75rem">${esc(fromName || fromAddr)}</b><br>${esc(fromName ? fromAddr : '')}${fromName ? ' · ' : ''}${isNaN(d) ? '' : esc(d.toLocaleString())}`;
         const bodyEl = document.getElementById('email-body');
         bodyEl.innerHTML = '';
         const html = Array.isArray(msg.html) ? msg.html.join('') : (msg.html || '');
